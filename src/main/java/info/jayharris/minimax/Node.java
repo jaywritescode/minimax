@@ -1,8 +1,8 @@
 package info.jayharris.minimax;
 
-import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.OptionalLong;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class Node<S extends State<S, A>, A extends Action<S, A>> {
@@ -21,17 +21,18 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private OptionalLong utility;
 
+    static Comparator<Node> comparator = Comparator.comparingLong(Node::getUtility);
+
     Node(S state, A action) {
         this.state = state;
         this.action = action;
         this.nodeFactory = new NodeFactory<>(state);
         this.utility = OptionalLong.empty();
-
     }
 
-    Collection<Node> successors() {
+    List<Node<S, A>> successors() {
         return state.actions().stream()
-                .map((Function<A, Node>) nodeFactory::withAction)
+                .map(nodeFactory::withAction)
                 .collect(Collectors.toList());
     }
 
@@ -48,6 +49,10 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     void setUtility() {
-        utility = state.utility();
+        this.utility = state.utility();
+    }
+
+    void setUtility(long utility) {
+        this.utility = OptionalLong.of(utility);
     }
 }

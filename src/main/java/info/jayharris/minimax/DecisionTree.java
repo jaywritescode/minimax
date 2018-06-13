@@ -1,11 +1,17 @@
 package info.jayharris.minimax;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
     final Node<S, A> root;
 
+    final Map<S, Long> transpositions;
+
     public DecisionTree(S root) {
         this.root = NodeFactory.rootNode(root);
+        this.transpositions = new HashMap<>();
     }
 
     public A perform() {
@@ -18,35 +24,25 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
             return node;
         }
 
-        long value = Long.MIN_VALUE;
-        Node<S, A> bestSuccessor = null;
-        for (Node<S, A> successor : node.successors()) {
-            long successorValue = minValue(successor).getUtility();
-            if (successorValue > value) {
-                value = successorValue;
-                bestSuccessor = successor;
-            }
-        }
-
-        return bestSuccessor;
+        return node.successors().stream()
+                .peek(n -> n.setUtility(minValue(n).getUtility()))
+                .max(Node.comparator)
+                .orElseThrow(RuntimeException::new);
     }
 
-    private Node<S,A> minValue(Node<S, A> node) {
+    private Node<S, A> minValue(Node<S, A> node) {
         if (node.terminalTest()) {
             node.setUtility();
             return node;
         }
 
-        long value = Long.MAX_VALUE;
-        Node<S, A> bestSuccessor = null;
-        for (Node<S, A> successor : node.successors()) {
-            long successorValue = maxValue(successor).getUtility();
-            if (successorValue < value) {
-                value = successorValue;
-                bestSuccessor = successor;
-            }
-        }
+        return node.successors().stream()
+                .peek(n -> n.setUtility(maxValue(n).getUtility()))
+                .min(Node.comparator)
+                .orElseThrow(RuntimeException::new);
+    }
 
-        return bestSuccessor;
+    private void addToTranspositionTable(S state, long value) {
+        this.transpositions.put(state, value);
     }
 }
