@@ -1,17 +1,11 @@
 package info.jayharris.minimax;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
     final Node<S, A> root;
 
-    final Map<S, Long> transpositions;
-
     public DecisionTree(S root) {
         this.root = NodeFactory.rootNode(root);
-        this.transpositions = new HashMap<>();
     }
 
     public A perform() {
@@ -40,9 +34,5 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(n -> n.setUtility(maxValue(n).getUtility()))
                 .min(Node.comparator)
                 .orElseThrow(RuntimeException::new);
-    }
-
-    private void addToTranspositionTable(S state, long value) {
-        this.transpositions.put(state, value);
     }
 }
