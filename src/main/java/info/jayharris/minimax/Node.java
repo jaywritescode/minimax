@@ -40,6 +40,10 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         return state.terminalTest();
     }
 
+    S getState() {
+        return state;
+    }
+
     A getAction() {
         return action;
     }
