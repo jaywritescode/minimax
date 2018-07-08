@@ -21,7 +21,6 @@ class TestState implements State<TestState, TestAction> {
     }
 
     @Override
-
     public Collection<TestAction> actions() {
         return actions;
     }
