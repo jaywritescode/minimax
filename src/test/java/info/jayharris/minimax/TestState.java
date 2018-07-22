@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.OptionalLong;
 
-class TestState implements State<TestState, TestAction> {
+public class TestState implements State<TestState, TestAction> {
 
     final String id;
 
