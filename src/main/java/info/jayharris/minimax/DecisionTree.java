@@ -1,6 +1,11 @@
 package info.jayharris.minimax;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
+
+    Logger logger = LoggerFactory.getLogger(DecisionTree.class);
 
     final Node<S, A> root;
 
@@ -13,6 +18,8 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     private Node<S, A> maxValue(Node<S, A> node) {
+        logger.debug("Determining maximum value among successors of {}", node.getState());
+
         if (node.terminalTest()) {
             node.setUtility();
             return node;
@@ -25,6 +32,8 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     private Node<S, A> minValue(Node<S, A> node) {
+        logger.debug("Determining minimum value among successors of {}", node.getState());
+
         if (node.terminalTest()) {
             node.setUtility();
             return node;
