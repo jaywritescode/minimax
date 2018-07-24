@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static info.jayharris.minimax.assertions.ProjectAssertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 class DecisionTreeTest {
 
@@ -89,4 +93,43 @@ class DecisionTreeTest {
         assertThat(transpositionTable).hasValue(C, 0);
     }
 
+    @Test
+    @DisplayName("it retrieves the persisted utility value if it exists")
+    void testUsePersistedutilityValues() {
+        TestState A, B, C, D, E, F, G, H, I;
+
+        G = TestState.terminalState("G", 7);
+        H = TestState.terminalState("H", 3);
+        I = TestState.terminalState("I", 8);
+
+        D = TestState.terminalState("D", 4);
+        E = TestState.nonTerminalState("E", Arrays.asList(
+                new TestAction(G),
+                new TestAction(H)
+        ));
+        F = TestState.nonTerminalState("F", Arrays.asList(
+                new TestAction(G),
+                new TestAction(I)
+        ));
+
+        B = TestState.nonTerminalState("B", Arrays.asList(
+                new TestAction(D),
+                new TestAction(E)
+        ));
+        C = TestState.nonTerminalState("C", Arrays.asList(
+                new TestAction(D),
+                new TestAction(F)
+        ));
+
+        A = TestState.nonTerminalState("A", Arrays.asList(
+                new TestAction(B),
+                new TestAction(C)
+        ));
+
+        BaseTranspositionTable<TestState, TestAction> transpositionTable = spy(new HashMapTranspositionTable<>());
+
+        DecisionTree<TestState, TestAction> decisionTree = new DecisionTree<>(A, transpositionTable);
+
+        decisionTree.perform();
+    }
 }
