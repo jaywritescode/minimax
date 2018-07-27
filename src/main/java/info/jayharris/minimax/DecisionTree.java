@@ -51,17 +51,14 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     private Optional<Node<S, A>> maxValue(Node<S, A> node) {
         if (transpositionTable.contains(node.getState())) {
             node.setUtility(transpositionTable.get(node.getState()).getAsLong());
-            return node;
+            return Optional.of(node);
         }
 
         if (node.terminalTest()) {
             logger.debug("Node {} is a terminal node. Setting its value, returning empty.");
-
-        return node.successors().stream()
-                .peek(n -> n.setUtility(minValue(n).getUtility()))
-                .max(Node.comparator)
-                .orElseThrow(RuntimeException::new);
-    }
+            node.setUtility(node.getState().utility());
+            return Optional.empty();
+        }
 
         logger.debug("Node {} is a non-terminal node. Iterating through successors, returning the successor with the greatest utility.", node.getState());
 
@@ -76,7 +73,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     private Optional<Node<S, A>> minValue(Node<S, A> node) {
         if (transpositionTable.contains(node.getState())) {
             node.setUtility(transpositionTable.get(node.getState()).getAsLong());
-            return node;
+            return Optional.of(node);
         }
 
         if (node.terminalTest()) {
