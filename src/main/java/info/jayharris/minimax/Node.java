@@ -52,12 +52,11 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         return utility.getAsLong();
     }
 
-    // TODO: this method shouldn't exist
-    void setUtility() {
-        this.utility = state.utility();
+    void setUtility(long utility) {
+        setUtility(OptionalLong.of(utility));
     }
 
-    void setUtility(long utility) {
-        this.utility = OptionalLong.of(utility);
+    void setUtility(OptionalLong utility) {
+        this.utility = utility;
     }
 }

@@ -24,7 +24,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         if (node.terminalTest()) {
             logger.debug("Node {} is a terminal node. Setting its value, returning empty.");
 
-            node.setUtility();
+            node.setUtility(node.getState().utility());
             return Optional.empty();
         }
 
@@ -42,7 +42,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         if (node.terminalTest()) {
             logger.debug("Node {} is a terminal node. Setting its value, returning empty.", node.getState());
 
-            node.setUtility();
+            node.setUtility(node.getState().utility());
             return Optional.empty();
         }
 
@@ -52,7 +52,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::maxValue)
                 .min(Node.comparator);
         optimal.ifPresent(o -> node.setUtility(o.getUtility()));
-        
+
         return optimal;
     }
 }
