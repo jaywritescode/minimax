@@ -52,6 +52,7 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         return utility.getAsLong();
     }
 
+    // TODO: this method shouldn't exist
     void setUtility() {
         this.utility = state.utility();
     }

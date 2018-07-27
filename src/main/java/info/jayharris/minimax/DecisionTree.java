@@ -3,6 +3,9 @@ package info.jayharris.minimax;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Optional;
+
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
     Logger logger = LoggerFactory.getLogger(DecisionTree.class);
@@ -14,34 +17,42 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     public A perform() {
-        return maxValue(root).getAction();
+        return maxValue(root).get().getAction();
     }
 
-    private Node<S, A> maxValue(Node<S, A> node) {
-        logger.debug("Determining maximum value among successors of {}", node.getState());
-
+    private Optional<Node<S, A>> maxValue(Node<S, A> node) {
         if (node.terminalTest()) {
+            logger.debug("Node {} is a terminal node. Setting its value, returning empty.");
+
             node.setUtility();
-            return node;
+            return Optional.empty();
         }
 
-        return node.successors().stream()
-                .peek(n -> n.setUtility(minValue(n).getUtility()))
-                .max(Node.comparator)
-                .orElseThrow(RuntimeException::new);
+        logger.debug("Node {} is a non-terminal node. Iterating through successors, returning the successor with the greatest utility.", node.getState());
+
+        Optional<Node<S, A>> optimal = node.successors().stream()
+                .peek(this::minValue)
+                .max(Node.comparator);
+        optimal.ifPresent(o -> node.setUtility(o.getUtility()));
+
+        return optimal;
     }
 
-    private Node<S, A> minValue(Node<S, A> node) {
-        logger.debug("Determining minimum value among successors of {}", node.getState());
-
+    private Optional<Node<S, A>> minValue(Node<S, A> node) {
         if (node.terminalTest()) {
+            logger.debug("Node {} is a terminal node. Setting its value, returning empty.", node.getState());
+
             node.setUtility();
-            return node;
+            return Optional.empty();
         }
 
-        return node.successors().stream()
-                .peek(n -> n.setUtility(maxValue(n).getUtility()))
-                .min(Node.comparator)
-                .orElseThrow(RuntimeException::new);
+        logger.debug("Node {} is a non-terminal node. Iterating through successors, returning the successor with the smallest utility.", node.getState());
+
+        Optional<Node<S, A>> optimal = node.successors().stream()
+                .peek(this::maxValue)
+                .min(Node.comparator);
+        optimal.ifPresent(o -> node.setUtility(o.getUtility()));
+        
+        return optimal;
     }
 }
