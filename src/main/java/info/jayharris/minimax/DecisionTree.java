@@ -52,7 +52,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         }
 
         if (node.terminalTest()) {
-            logger.debug("Node {} is a terminal node. Setting its value, returning empty.");
+            logger.debug("Node {} is a terminal node. Setting its value, returning empty.", node.getState());
             node.setUtility(node.getState().utility());
             transpositionTable.put(node.getState(), node.getUtility());
             return Optional.empty();
