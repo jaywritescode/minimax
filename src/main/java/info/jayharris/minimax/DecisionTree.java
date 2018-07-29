@@ -1,13 +1,10 @@
 package info.jayharris.minimax;
 
+import info.jayharris.minimax.transposition.BaseTranspositionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Optional;
-
-import info.jayharris.minimax.transposition.BaseTranspositionTable;
-
 import java.util.OptionalLong;
 
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
@@ -57,6 +54,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         if (node.terminalTest()) {
             logger.debug("Node {} is a terminal node. Setting its value, returning empty.");
             node.setUtility(node.getState().utility());
+            transpositionTable.put(node.getState(), node.getUtility());
             return Optional.empty();
         }
 
@@ -65,7 +63,11 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         Optional<Node<S, A>> optimal = node.successors().stream()
                 .peek(this::minValue)
                 .max(Node.comparator);
-        optimal.ifPresent(o -> node.setUtility(o.getUtility()));
+        optimal.ifPresent(o -> {
+            long utility = o.getUtility();
+            node.setUtility(utility);
+            transpositionTable.put(node.getState(), utility);
+        });
 
         return optimal;
     }
@@ -78,8 +80,8 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
         if (node.terminalTest()) {
             logger.debug("Node {} is a terminal node. Setting its value, returning empty.", node.getState());
-
             node.setUtility(node.getState().utility());
+            transpositionTable.put(node.getState(), node.getUtility());
             return Optional.empty();
         }
 
@@ -88,7 +90,11 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         Optional<Node<S, A>> optimal = node.successors().stream()
                 .peek(this::maxValue)
                 .min(Node.comparator);
-        optimal.ifPresent(o -> node.setUtility(o.getUtility()));
+        optimal.ifPresent(o -> {
+            long utility = o.getUtility();
+            node.setUtility(utility);
+            transpositionTable.put(node.getState(), utility);
+        });
 
         return optimal;
     }
