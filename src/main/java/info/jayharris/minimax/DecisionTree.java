@@ -4,7 +4,6 @@ import info.jayharris.minimax.transposition.BaseTranspositionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
 import java.util.OptionalLong;
 
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
@@ -42,54 +41,52 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     public A perform() {
-        return maxValue(root).get().getAction();
-    }
-
-    private Optional<Node<S, A>> maxValue(Node<S, A> node) {
-        if (transpositionTable.contains(node.getState())) {
-            node.setUtility(transpositionTable.get(node.getState()).getAsLong());
-            return Optional.of(node);
-        }
-
-        if (node.terminalTest()) {
-            node.setUtility(node.getState().utility());
-            transpositionTable.put(node.getState(), node.getUtility());
-            return Optional.empty();
-        }
-
-        Optional<Node<S, A>> optimal = node.successors().stream()
+        return root.successors().stream()
                 .peek(this::minValue)
-                .max(Node.comparator);
-        optimal.ifPresent(o -> {
-            long utility = o.getUtility();
-            node.setUtility(utility);
-            transpositionTable.put(node.getState(), utility);
-        });
-
-        return optimal;
+                .max(Node.comparator)
+                .map(Node::getAction)
+                .orElseThrow(RuntimeException::new);
     }
 
-    private Optional<Node<S, A>> minValue(Node<S, A> node) {
+    private void maxValue(Node<S, A> node) {
         if (transpositionTable.contains(node.getState())) {
             node.setUtility(transpositionTable.get(node.getState()).getAsLong());
-            return Optional.of(node);
+            return;
         }
 
         if (node.terminalTest()) {
             node.setUtility(node.getState().utility());
             transpositionTable.put(node.getState(), node.getUtility());
-            return Optional.empty();
+            return;
         }
 
-        Optional<Node<S, A>> optimal = node.successors().stream()
-                .peek(this::maxValue)
-                .min(Node.comparator);
-        optimal.ifPresent(o -> {
-            long utility = o.getUtility();
-            node.setUtility(utility);
-            transpositionTable.put(node.getState(), utility);
-        });
+        node.successors().stream()
+                .peek(this::minValue)
+                .max(Node.comparator)
+                .ifPresent(optimal -> {
+                    node.setUtility(optimal.getUtility());
+                    transpositionTable.put(node.getState(), node.getUtility());
+                });
+    }
 
-        return optimal;
+    private void minValue(Node<S, A> node) {
+        if (transpositionTable.contains(node.getState())) {
+            node.setUtility(transpositionTable.get(node.getState()).getAsLong());
+            return;
+        }
+
+        if (node.terminalTest()) {
+            node.setUtility(node.getState().utility());
+            transpositionTable.put(node.getState(), node.getUtility());
+            return;
+        }
+
+        node.successors().stream()
+                .peek(this::maxValue)
+                .min(Node.comparator)
+                .ifPresent(optimal -> {
+                    node.setUtility(optimal.getUtility());
+                    transpositionTable.put(node.getState(), node.getUtility());
+                });
     }
 }
