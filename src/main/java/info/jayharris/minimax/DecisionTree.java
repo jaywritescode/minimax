@@ -48,6 +48,10 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .orElseThrow(RuntimeException::new);
     }
 
+    public BaseTranspositionTable<S, A> getTranspositionTable() {
+        return transpositionTable;
+    }
+
     private void maxValue(Node<S, A> node) {
         if (transpositionTable.contains(node.getState())) {
             node.setUtility(transpositionTable.get(node.getState()).getAsLong());
