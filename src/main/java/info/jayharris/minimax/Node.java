@@ -17,22 +17,25 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
      */
     private final A action;
 
+    private final int depth;
+
     private final NodeFactory<S, A> nodeFactory;
 
     private OptionalLong utility;
 
     static Comparator<Node> comparator = Comparator.comparingLong(Node::getUtility);
 
-    Node(S state, A action) {
+    Node(S state, A action, int depth) {
         this.state = state;
         this.action = action;
+        this.depth = depth;
         this.nodeFactory = new NodeFactory<>(state);
         this.utility = OptionalLong.empty();
     }
 
     List<Node<S, A>> successors() {
         return state.actions().stream()
-                .map(nodeFactory::withAction)
+                .map(action -> nodeFactory.withAction(action, depth + 1))
                 .collect(Collectors.toList());
     }
 
@@ -46,6 +49,10 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     A getAction() {
         return action;
+    }
+
+    int getDepth() {
+        return depth;
     }
 
     long getUtility() {
