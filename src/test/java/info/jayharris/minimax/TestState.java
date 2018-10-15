@@ -2,21 +2,22 @@ package info.jayharris.minimax;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.OptionalLong;
+import java.util.OptionalDouble;
+import java.util.function.DoubleSupplier;
 
 public class TestState implements State<TestState, TestAction> {
 
     final String id;
 
     Collection<TestAction> actions;
-    OptionalLong utility;
+    DoubleSupplier supplier;
     boolean isTerminal;
 
-    private TestState(String id, Collection<TestAction> actions, OptionalLong utility) {
+    private TestState(String id, Collection<TestAction> actions, DoubleSupplier supplier) {
         this.id = id;
 
         this.actions = actions;
-        this.utility = utility;
+        this.supplier = supplier;
         this.isTerminal = actions.isEmpty();
     }
 
@@ -26,8 +27,13 @@ public class TestState implements State<TestState, TestAction> {
     }
 
     @Override
-    public OptionalLong utility() {
-        return utility;
+    public OptionalDouble utility() {
+        return OptionalDouble.of(supplier.getAsDouble());
+    }
+
+    @Override
+    public double eval() {
+        return utility().getAsDouble();
     }
 
     @Override
@@ -43,11 +49,11 @@ public class TestState implements State<TestState, TestAction> {
         return sb.toString();
     }
 
-    static TestState terminalState(String id, long utility) {
-        return new TestState(id, Collections.emptyList(), OptionalLong.of(utility));
+    static TestState terminalState(String id, double utility) {
+        return new TestState(id, Collections.emptyList(), () -> utility);
     }
 
     static TestState nonTerminalState(String id, Collection<TestAction> actions) {
-        return new TestState(id, actions, OptionalLong.empty());
+        return new TestState(id, actions, () -> { throw new RuntimeException(); });
     }
 }

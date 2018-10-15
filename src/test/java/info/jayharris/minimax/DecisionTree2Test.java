@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.OptionalDouble;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class DecisionTree2Test {
 
@@ -52,7 +51,7 @@ class DecisionTree2Test {
         ));
 
         DecisionTree2<TestState, TestAction> tree = new DecisionTree2<TestState, TestAction>(
-                new Node2<>(A, null, 0, () -> 0.0),
+                new Node2<>(A, null, 0),
                 new TestTranspositions(),
                 new TestCutoffTest()
         );

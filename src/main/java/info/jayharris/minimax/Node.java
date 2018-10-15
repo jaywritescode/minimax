@@ -2,7 +2,7 @@ package info.jayharris.minimax;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.OptionalLong;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 class Node<S extends State<S, A>, A extends Action<S, A>> {
@@ -21,7 +21,7 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final NodeFactory<S, A> nodeFactory;
 
-    private OptionalLong utility;
+    private OptionalDouble utility;
 
     static Comparator<Node> comparator = Comparator.comparingLong(Node::getUtility);
 
@@ -30,7 +30,7 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         this.action = action;
         this.depth = depth;
         this.nodeFactory = new NodeFactory<>(state);
-        this.utility = OptionalLong.empty();
+        this.utility = OptionalDouble.empty();
     }
 
     List<Node<S, A>> successors() {
@@ -55,15 +55,15 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         return depth;
     }
 
-    long getUtility() {
-        return utility.getAsLong();
+    double getUtility() {
+        return utility.getAsDouble();
     }
 
-    void setUtility(long utility) {
-        setUtility(OptionalLong.of(utility));
+    void setUtility(double utility) {
+        setUtility(OptionalDouble.of(utility));
     }
 
-    void setUtility(OptionalLong utility) {
+    void setUtility(OptionalDouble utility) {
         this.utility = utility;
     }
 }

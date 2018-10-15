@@ -26,12 +26,12 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.setEvalAsConstant(transpositions.get(state).getAsDouble());
+            node.memoizeHeuristicValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.setEvalAsConstant(node.getHeuristicValue());
+            node.memoizeHeuristicValue(node.getHeuristicValue());
             return;
         }
 
@@ -39,7 +39,7 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::minValue)
                 .max(Node2.comparator)
                 .ifPresent(optimal -> {
-                    node.setEvalAsConstant(optimal.getHeuristicValue());
+                    node.memoizeHeuristicValue(optimal.getHeuristicValue());
                     transpositions.put(state, node.getHeuristicValue());
                 });
     }
@@ -48,12 +48,12 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.setEvalAsConstant(transpositions.get(state).getAsDouble());
+            node.memoizeHeuristicValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.setEvalAsConstant(node.getHeuristicValue());
+            node.memoizeHeuristicValue(node.getHeuristicValue());
             return;
         }
 
@@ -61,7 +61,7 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::maxValue)
                 .min(Node2.comparator)
                 .ifPresent(optimal -> {
-                    node.setEvalAsConstant(optimal.getHeuristicValue());
+                    node.memoizeHeuristicValue(optimal.getHeuristicValue());
                     transpositions.put(state, node.getHeuristicValue());
                 });
     }
