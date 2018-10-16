@@ -26,12 +26,13 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.memoizeHeuristicValue(transpositions.get(state).getAsDouble());
+            node.setValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.memoizeHeuristicValue(node.getHeuristicValue());
+            node.calculateHeuristicValue();
+            transpositions.put(state, node.getValue());
             return;
         }
 
@@ -39,8 +40,8 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::minValue)
                 .max(Node2.comparator)
                 .ifPresent(optimal -> {
-                    node.memoizeHeuristicValue(optimal.getHeuristicValue());
-                    transpositions.put(state, node.getHeuristicValue());
+                    node.setValue(optimal.getValue());
+                    transpositions.put(state, node.getValue());
                 });
     }
     
@@ -48,12 +49,13 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.memoizeHeuristicValue(transpositions.get(state).getAsDouble());
+            node.setValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.memoizeHeuristicValue(node.getHeuristicValue());
+            node.calculateHeuristicValue();
+            transpositions.put(state, node.getValue());
             return;
         }
 
@@ -61,8 +63,8 @@ public class DecisionTree2<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::maxValue)
                 .min(Node2.comparator)
                 .ifPresent(optimal -> {
-                    node.memoizeHeuristicValue(optimal.getHeuristicValue());
-                    transpositions.put(state, node.getHeuristicValue());
+                    node.setValue(optimal.getValue());
+                    transpositions.put(state, node.getValue());
                 });
     }
 }

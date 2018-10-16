@@ -1,6 +1,7 @@
 package info.jayharris.minimax;
 
 import info.jayharris.minimax.transposition.Transpositions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -57,6 +58,45 @@ class DecisionTree2Test {
         );
 
         assertThat(tree.perform()).extracting("successor").first().isSameAs(B);
+    }
+
+    @Test
+    @DisplayName("it only calculates each node's heuristic value once")
+    void testCalculateHeuristicValueOnlyOnce() {
+        TestState A, B, C, s1, s2, s3, s4;
+
+        s1 = TestState.terminalState("s1", 4.0);
+        s2 = TestState.terminalState("s2", 5.0);
+        s3 = TestState.terminalState("s3", 6.0);
+        s4 = TestState.terminalState("s4", 7.0);
+
+        B = TestState.nonTerminalState("B", Arrays.asList(
+                new TestAction(s1)
+                , new TestAction(s2)
+                , new TestAction(s3)
+        ));
+        C = TestState.nonTerminalState("C", Arrays.asList(
+                new TestAction(s1)
+                , new TestAction(s2)
+                , new TestAction(s3)
+                , new TestAction(s4)
+        ));
+
+        A = TestState.nonTerminalState("A", Arrays.asList(
+                new TestAction(B),
+                new TestAction(C)
+        ));
+
+        DecisionTree2<TestState, TestAction> tree = new DecisionTree2<>(
+                new Node2<>(A, null, 0),
+                new TestTranspositions(),
+                new TestCutoffTest()
+        );
+
+        tree.perform();
+        assertThat(s1).extracting("evalCount").first().isEqualTo(1);
+        assertThat(s2).extracting("evalCount").first().isEqualTo(1);
+        assertThat(s3).extracting("evalCount").first().isEqualTo(1);
     }
 
     class TestTranspositions implements Transpositions<TestState, TestAction> {

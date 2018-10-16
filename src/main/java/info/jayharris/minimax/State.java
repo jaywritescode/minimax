@@ -25,6 +25,11 @@ public interface State<S extends State<S, A>, A extends Action<S, A>> {
      */
     OptionalDouble utility();
 
+    /**
+     * Evaluate this state.
+     *
+     * @return a heuristic value for this state, or a utility value if this is a terminal state
+     */
     double eval();
 
     /**

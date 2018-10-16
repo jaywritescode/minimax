@@ -1,11 +1,11 @@
 package info.jayharris.minimax;
 
 import java.util.Comparator;
+import java.util.OptionalDouble;
 import java.util.Set;
-import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 
-public class Node2<S extends State<S, A>, A extends Action<S, A>> {
+class Node2<S extends State<S, A>, A extends Action<S, A>> {
 
     private final S state;
 
@@ -13,15 +13,14 @@ public class Node2<S extends State<S, A>, A extends Action<S, A>> {
 
     private final int depth;
 
-    private DoubleSupplier heuristic;
+    private OptionalDouble value = OptionalDouble.empty();
 
-    public static Comparator<Node2> comparator = Comparator.comparingDouble(Node2::getHeuristicValue);
+    static Comparator<Node2> comparator = Comparator.comparingDouble(Node2::getValue);
 
-    public Node2(S state, A action, int depth) {
+    Node2(S state, A action, int depth) {
         this.state = state;
         this.action = action;
         this.depth = depth;
-        this.heuristic = state::eval;
     }
 
     Set<Node2<S, A>> successors() {
@@ -29,7 +28,7 @@ public class Node2<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     Node2<S, A> apply(A successorAction) {
-        return new Node2<S, A>(successorAction.apply(state), successorAction, depth + 1);
+        return new Node2<>(successorAction.apply(state), successorAction, depth + 1);
     }
 
     S getState() {
@@ -40,12 +39,16 @@ public class Node2<S extends State<S, A>, A extends Action<S, A>> {
         return action;
     }
 
-    void memoizeHeuristicValue(double value) {
-        this.heuristic = () -> value;
+    void calculateHeuristicValue() {
+        setValue(state.eval());
     }
 
-    double getHeuristicValue() {
-        return heuristic.getAsDouble();
+    double getValue() {
+        return value.getAsDouble();
+    }
+
+    void setValue(double value) {
+        this.value = OptionalDouble.of(value);
     }
 
     boolean terminalTest() {

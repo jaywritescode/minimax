@@ -13,6 +13,8 @@ public class TestState implements State<TestState, TestAction> {
     DoubleSupplier supplier;
     boolean isTerminal;
 
+    int evalCount = 0;
+
     private TestState(String id, Collection<TestAction> actions, DoubleSupplier supplier) {
         this.id = id;
 
@@ -33,6 +35,7 @@ public class TestState implements State<TestState, TestAction> {
 
     @Override
     public double eval() {
+        evalCount++;
         return utility().getAsDouble();
     }
 
