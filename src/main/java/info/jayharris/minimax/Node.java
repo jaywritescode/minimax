@@ -17,7 +17,7 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     static final Comparator<Node> comparator = Comparator.comparingDouble(Node::getHeuristicValue);
 
-    Node(S state, A action, int depth) {
+    private Node(S state, A action, int depth) {
         this.state = state;
         this.action = action;
         this.depth = depth;

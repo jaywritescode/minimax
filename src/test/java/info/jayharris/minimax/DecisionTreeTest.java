@@ -52,7 +52,7 @@ class DecisionTreeTest {
         ));
 
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
-                new Node<>(A, null, 0),
+                Node.root(A),
                 new TestTranspositions(),
                 new TestCutoffTest()
         );
@@ -88,7 +88,7 @@ class DecisionTreeTest {
         ));
 
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
-                new Node<>(A, null, 0),
+                Node.root(A),
                 new TestTranspositions(),
                 new TestCutoffTest()
         );
