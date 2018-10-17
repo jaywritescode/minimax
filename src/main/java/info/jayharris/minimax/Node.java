@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 
-class Node<S extends State<S, A>, A extends Action<S, A>> {
+public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final S state;
 
@@ -21,7 +21,7 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
         this.state = state;
         this.action = action;
         this.depth = depth;
-        this.valueSupplier = () -> state.eval();
+        this.valueSupplier = state::eval;
     }
 
     Set<Node<S, A>> successors() {
@@ -54,5 +54,9 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     boolean terminalTest() {
         return state.terminalTest();
+    }
+
+    public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> root(S state) {
+        return new Node<>(state, null, 0);
     }
 }
