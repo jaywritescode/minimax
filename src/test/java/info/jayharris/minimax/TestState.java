@@ -7,13 +7,13 @@ import java.util.function.DoubleSupplier;
 
 public class TestState implements State<TestState, TestAction> {
 
-    final String id;
+    private final String id;
 
-    Collection<TestAction> actions;
-    DoubleSupplier supplier;
-    boolean isTerminal;
+    private Collection<TestAction> actions;
+    private DoubleSupplier supplier;
+    private boolean isTerminal;
 
-    int evalCount = 0;
+    private int evalCount = 0;
 
     private TestState(String id, Collection<TestAction> actions, DoubleSupplier supplier) {
         this.id = id;
@@ -46,7 +46,7 @@ public class TestState implements State<TestState, TestAction> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TestState{");
+        final StringBuilder sb = new StringBuilder("TestState{");
         sb.append("id='").append(id).append('\'');
         sb.append('}');
         return sb.toString();

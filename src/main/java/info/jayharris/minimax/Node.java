@@ -1,8 +1,8 @@
 package info.jayharris.minimax;
 
 import java.util.Comparator;
-import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 
 class Node<S extends State<S, A>, A extends Action<S, A>> {
@@ -13,21 +13,22 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final int depth;
 
-    private OptionalDouble value = OptionalDouble.empty();
+    private DoubleSupplier valueSupplier;
 
-    static Comparator<Node> comparator = Comparator.comparingDouble(Node::getValue);
+    static final Comparator<Node> comparator = Comparator.comparingDouble(Node::getHeuristicValue);
 
     Node(S state, A action, int depth) {
         this.state = state;
         this.action = action;
         this.depth = depth;
+        this.valueSupplier = () -> state.eval();
     }
 
     Set<Node<S, A>> successors() {
         return state.actions().stream().map(this::apply).collect(Collectors.toSet());
     }
 
-    Node<S, A> apply(A successorAction) {
+    private Node<S, A> apply(A successorAction) {
         return new Node<>(successorAction.apply(state), successorAction, depth + 1);
     }
 
@@ -40,15 +41,15 @@ class Node<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     void calculateHeuristicValue() {
-        setValue(state.eval());
+        setHeuristicValueToConstant(state.eval());
     }
 
-    double getValue() {
-        return value.getAsDouble();
+    double getHeuristicValue() {
+        return valueSupplier.getAsDouble();
     }
 
-    void setValue(double value) {
-        this.value = OptionalDouble.of(value);
+    void setHeuristicValueToConstant(double value) {
+        this.valueSupplier = () -> value;
     }
 
     boolean terminalTest() {

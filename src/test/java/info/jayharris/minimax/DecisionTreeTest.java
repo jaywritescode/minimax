@@ -51,7 +51,7 @@ class DecisionTreeTest {
                 new TestAction(D)
         ));
 
-        DecisionTree<TestState, TestAction> tree = new DecisionTree<TestState, TestAction>(
+        DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
                 new Node<>(A, null, 0),
                 new TestTranspositions(),
                 new TestCutoffTest()
@@ -101,7 +101,7 @@ class DecisionTreeTest {
 
     class TestTranspositions implements Transpositions<TestState, TestAction> {
 
-        Map<TestState, Double> map;
+        final Map<TestState, Double> map;
 
         TestTranspositions() {
             map = new HashMap<>();

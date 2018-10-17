@@ -15,7 +15,7 @@ class TestAction implements Action<TestState, TestAction> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TestAction{");
+        final StringBuilder sb = new StringBuilder("TestAction{");
         sb.append("successor=").append(successor);
         sb.append('}');
         return sb.toString();

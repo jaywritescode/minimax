@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
 
 public class InMemoryMapTranspositions<S extends State<S, A>, A extends Action<S, A>> implements Transpositions<S, A> {
 
-    Map<S, Double> map = new HashMap<>();
+    private final Map<S, Double> map = new HashMap<>();
 
     @Override
     public OptionalDouble get(S state) {
