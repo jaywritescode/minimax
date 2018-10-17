@@ -1,43 +1,17 @@
 package info.jayharris.minimax;
 
-import info.jayharris.minimax.transposition.BaseTranspositionTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.OptionalLong;
+import info.jayharris.minimax.transposition.Transpositions;
 
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
-    Logger logger = LoggerFactory.getLogger(DecisionTree.class);
-
     final Node<S, A> root;
-    final BaseTranspositionTable<S, A> transpositionTable;
+    final Transpositions<S, A> transpositions;
+    final CutoffTest<S, A> cutoffTest;
 
-    public DecisionTree(S root) {
-        this(root, new BaseTranspositionTable<S, A>() {
-            @Override
-            public boolean contains(S state) {
-                return false;
-            }
-
-            @Override
-            public OptionalLong get(S state) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void put(S state, long utility) { }
-
-            @Override
-            public long size() {
-                return 0;
-            }
-        });
-    }
-
-    public DecisionTree(S root, BaseTranspositionTable<S, A> transpositionTable) {
-        this.root = NodeFactory.rootNode(root);
-        this.transpositionTable = transpositionTable;
+    public DecisionTree(Node<S, A> root, Transpositions<S, A> transpositions, CutoffTest<S, A> cutoffTest) {
+        this.root = root;
+        this.transpositions = transpositions;
+        this.cutoffTest = cutoffTest;
     }
 
     public A perform() {
@@ -48,19 +22,17 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .orElseThrow(RuntimeException::new);
     }
 
-    public BaseTranspositionTable<S, A> getTranspositionTable() {
-        return transpositionTable;
-    }
-
     private void maxValue(Node<S, A> node) {
-        if (transpositionTable.contains(node.getState())) {
-            node.setUtility(transpositionTable.get(node.getState()).getAsLong());
+        S state = node.getState();
+
+        if (transpositions.get(state).isPresent()) {
+            node.setValue(transpositions.get(state).getAsDouble());
             return;
         }
 
-        if (node.terminalTest()) {
-            node.setUtility(node.getState().utility());
-            transpositionTable.put(node.getState(), node.getUtility());
+        if (node.terminalTest() || cutoffTest.apply(node)) {
+            node.calculateHeuristicValue();
+            transpositions.put(state, node.getValue());
             return;
         }
 
@@ -68,20 +40,22 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::minValue)
                 .max(Node.comparator)
                 .ifPresent(optimal -> {
-                    node.setUtility(optimal.getUtility());
-                    transpositionTable.put(node.getState(), node.getUtility());
+                    node.setValue(optimal.getValue());
+                    transpositions.put(state, node.getValue());
                 });
     }
-
+    
     private void minValue(Node<S, A> node) {
-        if (transpositionTable.contains(node.getState())) {
-            node.setUtility(transpositionTable.get(node.getState()).getAsLong());
+        S state = node.getState();
+
+        if (transpositions.get(state).isPresent()) {
+            node.setValue(transpositions.get(state).getAsDouble());
             return;
         }
 
-        if (node.terminalTest()) {
-            node.setUtility(node.getState().utility());
-            transpositionTable.put(node.getState(), node.getUtility());
+        if (node.terminalTest() || cutoffTest.apply(node)) {
+            node.calculateHeuristicValue();
+            transpositions.put(state, node.getValue());
             return;
         }
 
@@ -89,8 +63,8 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::maxValue)
                 .min(Node.comparator)
                 .ifPresent(optimal -> {
-                    node.setUtility(optimal.getUtility());
-                    transpositionTable.put(node.getState(), node.getUtility());
+                    node.setValue(optimal.getValue());
+                    transpositions.put(state, node.getValue());
                 });
     }
 }

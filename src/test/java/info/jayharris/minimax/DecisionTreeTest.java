@@ -1,22 +1,19 @@
 package info.jayharris.minimax;
 
-import info.jayharris.minimax.transposition.BaseTranspositionTable;
-import info.jayharris.minimax.transposition.HashMapTranspositionTable;
+import info.jayharris.minimax.transposition.Transpositions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalDouble;
 
-import static info.jayharris.minimax.assertions.ProjectAssertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DecisionTreeTest {
 
     @Test
-    @DisplayName("it returns the optimal action")
     void perform() {
         TestState A, B, C, D, b1, b2, b3, c1, c2, c3, d1, d2, d3;
 
@@ -54,71 +51,35 @@ class DecisionTreeTest {
                 new TestAction(D)
         ));
 
-        DecisionTree<TestState, TestAction> tree = new DecisionTree<>(A);
+        DecisionTree<TestState, TestAction> tree = new DecisionTree<TestState, TestAction>(
+                new Node<>(A, null, 0),
+                new TestTranspositions(),
+                new TestCutoffTest()
+        );
 
-        assertThat(tree.perform().successor).isSameAs(B);
+        assertThat(tree.perform()).extracting("successor").first().isSameAs(B);
     }
 
     @Test
-    @DisplayName("it persists the calculated utility values in the transposition table")
-    void testPersistUtilityValues() {
-        TestState A, B, C, b1, b2, b3;
+    @DisplayName("it only calculates each node's heuristic value once")
+    void testCalculateHeuristicValueOnlyOnce() {
+        TestState A, B, C, s1, s2, s3, s4;
 
-        b1 = TestState.terminalState("b1", 3);
-        b2 = TestState.terminalState("b2", 12);
-        b3 = TestState.terminalState("b3", 8);
-
-        B = TestState.nonTerminalState("B", Arrays.asList(
-                new TestAction(b1),
-                new TestAction(b2),
-                new TestAction(b3)
-        ));
-        C = TestState.terminalState("C", 0);
-
-        A = TestState.nonTerminalState("A", Arrays.asList(
-                new TestAction(B),
-                new TestAction(C)
-        ));
-
-        BaseTranspositionTable<TestState, TestAction> transpositionTable = new HashMapTranspositionTable<>();
-
-        DecisionTree<TestState, TestAction> decisionTree = new DecisionTree<>(A, transpositionTable);
-
-        decisionTree.perform();
-
-        assertThat(transpositionTable).hasValue(b1, 3);
-        assertThat(transpositionTable).hasValue(b2, 12);
-        assertThat(transpositionTable).hasValue(b3, 8);
-        assertThat(transpositionTable).hasValue(B, 3);
-        assertThat(transpositionTable).hasValue(C, 0);
-    }
-
-    @Test
-    @DisplayName("it retrieves the persisted utility value if it exists")
-    void testUsePersistedutilityValues() {
-        TestState A, B, C, D, E, F, G, H, I;
-
-        G = TestState.terminalState("G", 7);
-        H = TestState.terminalState("H", 3);
-        I = TestState.terminalState("I", 8);
-
-        D = TestState.terminalState("D", 4);
-        E = TestState.nonTerminalState("E", Arrays.asList(
-                new TestAction(G),
-                new TestAction(H)
-        ));
-        F = TestState.nonTerminalState("F", Arrays.asList(
-                new TestAction(G),
-                new TestAction(I)
-        ));
+        s1 = TestState.terminalState("s1", 4.0);
+        s2 = TestState.terminalState("s2", 5.0);
+        s3 = TestState.terminalState("s3", 6.0);
+        s4 = TestState.terminalState("s4", 7.0);
 
         B = TestState.nonTerminalState("B", Arrays.asList(
-                new TestAction(D),
-                new TestAction(E)
+                new TestAction(s1)
+                , new TestAction(s2)
+                , new TestAction(s3)
         ));
         C = TestState.nonTerminalState("C", Arrays.asList(
-                new TestAction(D),
-                new TestAction(F)
+                new TestAction(s1)
+                , new TestAction(s2)
+                , new TestAction(s3)
+                , new TestAction(s4)
         ));
 
         A = TestState.nonTerminalState("A", Arrays.asList(
@@ -126,10 +87,46 @@ class DecisionTreeTest {
                 new TestAction(C)
         ));
 
-        BaseTranspositionTable<TestState, TestAction> transpositionTable = spy(new HashMapTranspositionTable<>());
+        DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
+                new Node<>(A, null, 0),
+                new TestTranspositions(),
+                new TestCutoffTest()
+        );
 
-        DecisionTree<TestState, TestAction> decisionTree = new DecisionTree<>(A, transpositionTable);
+        tree.perform();
+        assertThat(s1).extracting("evalCount").first().isEqualTo(1);
+        assertThat(s2).extracting("evalCount").first().isEqualTo(1);
+        assertThat(s3).extracting("evalCount").first().isEqualTo(1);
+    }
 
-        decisionTree.perform();
+    class TestTranspositions implements Transpositions<TestState, TestAction> {
+
+        Map<TestState, Double> map;
+
+        TestTranspositions() {
+            map = new HashMap<>();
+        }
+
+        @Override
+        public OptionalDouble get(TestState equivalence) {
+            if (map.containsKey(equivalence)) {
+                return OptionalDouble.of(map.get(equivalence));
+            }
+
+            return OptionalDouble.empty();
+        }
+
+        @Override
+        public void put(TestState equivalences, double utility) {
+            map.put(equivalences, utility);
+        }
+    }
+
+    class TestCutoffTest implements CutoffTest<TestState, TestAction> {
+
+        @Override
+        public boolean apply(Node<TestState, TestAction> node) {
+            return node.terminalTest();
+        }
     }
 }
