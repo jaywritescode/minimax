@@ -1,7 +1,6 @@
 package info.jayharris.minimax;
 
 import java.util.Collection;
-import java.util.OptionalDouble;
 
 /**
  * Represents a state in the game.
@@ -17,13 +16,6 @@ public interface State<S extends State<S, A>, A extends Action<S, A>> {
      * @return a collection of legal moves
      */
     Collection<A> actions();
-
-    /**
-     * Get the utility of this state, if this is a terminal state.
-     *
-     * @return the utility of this state, or {@code OptionalDouble.empty()} if this is not a terminal state.
-     */
-    OptionalDouble utility();
 
     /**
      * Evaluate this state.

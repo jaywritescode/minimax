@@ -2,7 +2,7 @@ package info.jayharris.minimax;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.OptionalDouble;
+import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 public class TestState implements State<TestState, TestAction> {
@@ -29,14 +29,9 @@ public class TestState implements State<TestState, TestAction> {
     }
 
     @Override
-    public OptionalDouble utility() {
-        return OptionalDouble.of(supplier.getAsDouble());
-    }
-
-    @Override
     public double eval() {
         evalCount++;
-        return utility().getAsDouble();
+        return supplier.getAsDouble();
     }
 
     @Override
@@ -57,6 +52,6 @@ public class TestState implements State<TestState, TestAction> {
     }
 
     static TestState nonTerminalState(String id, Collection<TestAction> actions) {
-        return new TestState(id, actions, () -> { throw new RuntimeException(); });
+        return new TestState(id, actions, () -> new Random().nextDouble() * 2 - 1);
     }
 }
