@@ -32,12 +32,16 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
         return new Node<>(successorAction.apply(state), successorAction, depth + 1);
     }
 
-    S getState() {
+    public S getState() {
         return state;
     }
 
-    A getAction() {
+    public A getAction() {
         return action;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
     void calculateHeuristicValue() {
