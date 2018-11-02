@@ -15,7 +15,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     }
 
     public A perform() {
-        return root.successors().stream()
+        return root.successors()
                 .peek(this::minValue)
                 .max(Node.comparator)
                 .map(Node::getAction)
@@ -36,7 +36,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
             return;
         }
 
-        node.successors().stream()
+        node.successors()
                 .peek(this::minValue)
                 .max(Node.comparator)
                 .ifPresent(optimal -> {
@@ -59,7 +59,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
             return;
         }
 
-        node.successors().stream()
+        node.successors()
                 .peek(this::maxValue)
                 .min(Node.comparator)
                 .ifPresent(optimal -> {

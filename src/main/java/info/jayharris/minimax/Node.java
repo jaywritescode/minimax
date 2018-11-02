@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
@@ -24,8 +26,8 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
         this.valueSupplier = state::eval;
     }
 
-    Set<Node<S, A>> successors() {
-        return state.actions().stream().map(this::apply).collect(Collectors.toSet());
+    public Stream<Node<S, A>> successors() {
+        return state.actions().stream().map(this::apply);
     }
 
     private Node<S, A> apply(A successorAction) {
