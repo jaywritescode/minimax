@@ -5,7 +5,7 @@ import java.util.OptionalDouble;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
-class Node<S extends State<S, A>, A extends Action<S, A>> {
+public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final S state;
 
