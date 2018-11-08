@@ -5,13 +5,13 @@ import info.jayharris.minimax.transposition.Transpositions;
 public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
     private final Node<S, A> root;
-    private final Transpositions<S, A> transpositions;
+    private final Transpositions<S> transpositions;
     private final HeuristicEvaluationFunction<S> heuristicFunction;
     private final CutoffTest<S> cutoffTest;
 
     public DecisionTree(
             Node<S, A> root,
-            Transpositions<S, A> transpositions,
+            Transpositions<S> transpositions,
             HeuristicEvaluationFunction<S> heuristicFunction,
             CutoffTest<S> cutoffTest) {
         this.root = root;

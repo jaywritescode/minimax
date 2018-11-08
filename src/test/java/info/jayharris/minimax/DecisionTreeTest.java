@@ -123,7 +123,7 @@ class DecisionTreeTest {
         assertThat(s1).extracting("evalCount").first().isEqualTo(0);
     }
 
-    class TestTranspositions implements Transpositions<TestState, TestAction> {
+    class TestTranspositions implements Transpositions<TestState> {
 
         final Map<TestState, Double> map;
 
