@@ -1,13 +1,11 @@
 package info.jayharris.minimax;
 
 import java.util.Comparator;
-import java.util.Set;
-import java.util.function.DoubleSupplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.OptionalDouble;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
-public class Node<S extends State<S, A>, A extends Action<S, A>> {
+class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final S state;
 
@@ -15,15 +13,16 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
     private final int depth;
 
-    private DoubleSupplier valueSupplier;
+    private OptionalDouble heuristicValue;
 
     static final Comparator<Node> comparator = Comparator.comparingDouble(Node::getHeuristicValue);
 
-    private Node(S state, A action, int depth) {
+    protected Node(S state, A action, int depth) {
         this.state = state;
         this.action = action;
         this.depth = depth;
-        this.valueSupplier = state::eval;
+
+        heuristicValue = OptionalDouble.empty();
     }
 
     public Stream<Node<S, A>> successors() {
@@ -46,20 +45,30 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
         return depth;
     }
 
-    void calculateHeuristicValue() {
-        setHeuristicValueToConstant(state.eval());
-    }
-
     double getHeuristicValue() {
-        return valueSupplier.getAsDouble();
+        // TODO: probably should not be a runtime exception, because this would indicate an actual bug
+        return heuristicValue.orElseThrow(RuntimeException::new);
     }
 
-    void setHeuristicValueToConstant(double value) {
-        this.valueSupplier = () -> value;
+    void setHeuristicValue(double value) {
+        heuristicValue = OptionalDouble.of(value);
+    }
+
+    void calculateHeuristicValue(HeuristicEvaluationFunction<S> heuristic) {
+        heuristicValue = OptionalDouble.of(heuristic.apply(state));
     }
 
     boolean terminalTest() {
         return state.terminalTest();
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Node.class.getSimpleName() + "[", "]")
+                .add("state=" + state)
+                .add("action=" + action)
+                .add("heuristicValue=" + heuristicValue)
+                .toString();
     }
 
     public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> root(S state) {

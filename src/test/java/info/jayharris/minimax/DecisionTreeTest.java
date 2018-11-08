@@ -54,6 +54,7 @@ class DecisionTreeTest {
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
                 Node.root(A),
                 new TestTranspositions(),
+                new TestHeuristicEvaluationFunction(),
                 new TestCutoffTest()
         );
 
@@ -71,15 +72,15 @@ class DecisionTreeTest {
         s4 = TestState.terminalState("s4", 7.0);
 
         B = TestState.nonTerminalState("B", Arrays.asList(
-                new TestAction(s1)
-                , new TestAction(s2)
-                , new TestAction(s3)
+                new TestAction(s1),
+                new TestAction(s2),
+                new TestAction(s3)
         ));
         C = TestState.nonTerminalState("C", Arrays.asList(
-                new TestAction(s1)
-                , new TestAction(s2)
-                , new TestAction(s3)
-                , new TestAction(s4)
+                new TestAction(s1),
+                new TestAction(s2),
+                new TestAction(s3),
+                new TestAction(s4)
         ));
 
         A = TestState.nonTerminalState("A", Arrays.asList(
@@ -90,13 +91,39 @@ class DecisionTreeTest {
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
                 Node.root(A),
                 new TestTranspositions(),
+                new TestHeuristicEvaluationFunction(),
                 new TestCutoffTest()
         );
 
         tree.perform();
+
         assertThat(s1).extracting("evalCount").first().isEqualTo(1);
         assertThat(s2).extracting("evalCount").first().isEqualTo(1);
         assertThat(s3).extracting("evalCount").first().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("it stops generating successors when the cutoff test obtains")
+    void testStopAtCutoffTest() {
+        TestState A, B, C, D, s1;
+
+        s1 = TestState.terminalState("s1", 6);
+
+        D = TestState.nonTerminalState("D", Arrays.asList(new TestAction(s1)));
+        C = TestState.nonTerminalState("C", Arrays.asList(new TestAction(D)));
+        B = TestState.nonTerminalState("B", Arrays.asList(new TestAction(C)));
+        A = TestState.nonTerminalState("A", Arrays.asList(new TestAction(B)));
+
+        DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
+                Node.root(A),
+                new TestTranspositions(),
+                new TestHeuristicEvaluationFunction(),
+                new TestCutoffTest()
+        );
+
+        tree.perform();
+
+        assertThat(s1).extracting("evalCount").first().isEqualTo(0);
     }
 
     class TestTranspositions implements Transpositions<TestState, TestAction> {
@@ -126,7 +153,15 @@ class DecisionTreeTest {
 
         @Override
         public boolean apply(Node<TestState, TestAction> node) {
-            return node.terminalTest();
+            return node.getDepth() >= 2;
+        }
+    }
+
+    class TestHeuristicEvaluationFunction implements HeuristicEvaluationFunction<TestState> {
+
+        @Override
+        public double apply(TestState state) {
+            return state.eval();
         }
     }
 }

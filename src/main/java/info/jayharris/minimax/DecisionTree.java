@@ -6,11 +6,17 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
 
     private final Node<S, A> root;
     private final Transpositions<S, A> transpositions;
+    private final HeuristicEvaluationFunction<S> heuristicFunction;
     private final CutoffTest<S, A> cutoffTest;
 
-    public DecisionTree(Node<S, A> root, Transpositions<S, A> transpositions, CutoffTest<S, A> cutoffTest) {
+    public DecisionTree(
+            Node<S, A> root,
+            Transpositions<S, A> transpositions,
+            HeuristicEvaluationFunction<S> heuristicFunction,
+            CutoffTest<S, A> cutoffTest) {
         this.root = root;
         this.transpositions = transpositions;
+        this.heuristicFunction = heuristicFunction;
         this.cutoffTest = cutoffTest;
     }
 
@@ -26,12 +32,12 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.setHeuristicValueToConstant(transpositions.get(state).getAsDouble());
+            node.setHeuristicValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.calculateHeuristicValue();
+            node.calculateHeuristicValue(heuristicFunction);
             transpositions.put(state, node.getHeuristicValue());
             return;
         }
@@ -40,7 +46,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::minValue)
                 .max(Node.comparator)
                 .ifPresent(optimal -> {
-                    node.setHeuristicValueToConstant(optimal.getHeuristicValue());
+                    node.setHeuristicValue(optimal.getHeuristicValue());
                     transpositions.put(state, node.getHeuristicValue());
                 });
     }
@@ -49,12 +55,12 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
         S state = node.getState();
 
         if (transpositions.get(state).isPresent()) {
-            node.setHeuristicValueToConstant(transpositions.get(state).getAsDouble());
+            node.setHeuristicValue(transpositions.get(state).getAsDouble());
             return;
         }
 
         if (node.terminalTest() || cutoffTest.apply(node)) {
-            node.calculateHeuristicValue();
+            node.calculateHeuristicValue(heuristicFunction);
             transpositions.put(state, node.getHeuristicValue());
             return;
         }
@@ -63,7 +69,7 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
                 .peek(this::maxValue)
                 .min(Node.comparator)
                 .ifPresent(optimal -> {
-                    node.setHeuristicValueToConstant(optimal.getHeuristicValue());
+                    node.setHeuristicValue(optimal.getHeuristicValue());
                     transpositions.put(state, node.getHeuristicValue());
                 });
     }

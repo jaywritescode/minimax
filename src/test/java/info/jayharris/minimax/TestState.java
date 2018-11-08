@@ -2,24 +2,22 @@ package info.jayharris.minimax;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Random;
-import java.util.function.DoubleSupplier;
 
 public class TestState implements State<TestState, TestAction> {
 
     private final String id;
 
     private Collection<TestAction> actions;
-    private DoubleSupplier supplier;
+    private double heuristicValue;
     private boolean isTerminal;
 
     private int evalCount = 0;
 
-    private TestState(String id, Collection<TestAction> actions, DoubleSupplier supplier) {
+    public TestState(String id, Collection<TestAction> actions, double heuristicValue) {
         this.id = id;
 
         this.actions = actions;
-        this.supplier = supplier;
+        this.heuristicValue = heuristicValue;
         this.isTerminal = actions.isEmpty();
     }
 
@@ -31,7 +29,7 @@ public class TestState implements State<TestState, TestAction> {
     @Override
     public double eval() {
         evalCount++;
-        return supplier.getAsDouble();
+        return heuristicValue;
     }
 
     @Override
@@ -47,11 +45,11 @@ public class TestState implements State<TestState, TestAction> {
         return sb.toString();
     }
 
-    static TestState terminalState(String id, double utility) {
-        return new TestState(id, Collections.emptyList(), () -> utility);
+    static TestState terminalState(String id, double heuristicValue) {
+        return new TestState(id, Collections.emptyList(), heuristicValue);
     }
 
     static TestState nonTerminalState(String id, Collection<TestAction> actions) {
-        return new TestState(id, actions, () -> new Random().nextDouble() * 2 - 1);
+        return new TestState(id, actions, Double.NaN);
     }
 }
