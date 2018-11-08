@@ -4,10 +4,7 @@ import info.jayharris.minimax.transposition.Transpositions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.OptionalDouble;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -109,10 +106,10 @@ class DecisionTreeTest {
 
         s1 = TestState.terminalState("s1", 6);
 
-        D = TestState.nonTerminalState("D", Arrays.asList(new TestAction(s1)));
-        C = TestState.nonTerminalState("C", Arrays.asList(new TestAction(D)));
-        B = TestState.nonTerminalState("B", Arrays.asList(new TestAction(C)));
-        A = TestState.nonTerminalState("A", Arrays.asList(new TestAction(B)));
+        D = TestState.nonTerminalState("D", Collections.singletonList(new TestAction(s1)));
+        C = TestState.nonTerminalState("C", Collections.singletonList(new TestAction(D)));
+        B = TestState.nonTerminalState("B", Collections.singletonList(new TestAction(C)));
+        A = TestState.nonTerminalState("A", Collections.singletonList(new TestAction(B)));
 
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
                 Node.root(A),
