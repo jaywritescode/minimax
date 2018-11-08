@@ -146,10 +146,10 @@ class DecisionTreeTest {
         }
     }
 
-    class TestCutoffTest implements CutoffTest<TestState, TestAction> {
+    class TestCutoffTest implements CutoffTest<TestState> {
 
         @Override
-        public boolean apply(Node<TestState, TestAction> node) {
+        public boolean apply(Node<TestState, ?> node) {
             return node.getDepth() >= 2;
         }
     }

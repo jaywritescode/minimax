@@ -7,13 +7,13 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     private final Node<S, A> root;
     private final Transpositions<S, A> transpositions;
     private final HeuristicEvaluationFunction<S> heuristicFunction;
-    private final CutoffTest<S, A> cutoffTest;
+    private final CutoffTest<S> cutoffTest;
 
     public DecisionTree(
             Node<S, A> root,
             Transpositions<S, A> transpositions,
             HeuristicEvaluationFunction<S> heuristicFunction,
-            CutoffTest<S, A> cutoffTest) {
+            CutoffTest<S> cutoffTest) {
         this.root = root;
         this.transpositions = transpositions;
         this.heuristicFunction = heuristicFunction;
