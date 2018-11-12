@@ -1,14 +1,34 @@
 package info.jayharris.minimax;
 
 import info.jayharris.minimax.transposition.Transpositions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@TestInstance(Lifecycle.PER_CLASS)
 class DecisionTreeTest {
+
+    @Mock
+    HeuristicEvaluationFunction<TestState> fn;
+
+    @BeforeAll
+    void init() {
+        MockitoAnnotations.initMocks(this);
+
+        when(fn.apply(any())).thenReturn(new Random().nextDouble());
+    }
 
     @Test
     void perform() {
@@ -59,7 +79,7 @@ class DecisionTreeTest {
     }
 
     @Test
-    @DisplayName("it only calculates each node's heuristic value once")
+    @DisplayName("it only calculates each state's heuristic value once")
     void testCalculateHeuristicValueOnlyOnce() {
         TestState A, B, C, s1, s2, s3, s4;
 
@@ -86,17 +106,12 @@ class DecisionTreeTest {
         ));
 
         DecisionTree<TestState, TestAction> tree = new DecisionTree<>(
-                Node.root(A),
-                new TestTranspositions(),
-                new TestHeuristicEvaluationFunction(),
-                new TestCutoffTest()
+                Node.root(A), new TestTranspositions(), fn, new TestCutoffTest()
         );
 
         tree.perform();
 
-        assertThat(s1).extracting("evalCount").first().isEqualTo(1);
-        assertThat(s2).extracting("evalCount").first().isEqualTo(1);
-        assertThat(s3).extracting("evalCount").first().isEqualTo(1);
+        Stream.of(s1, s2, s3).forEach(state -> verify(fn).apply(state));
     }
 
     @Test
@@ -158,7 +173,7 @@ class DecisionTreeTest {
 
         @Override
         public double apply(TestState state) {
-            return state.eval();
+            return state.heuristicValue;
         }
     }
 }

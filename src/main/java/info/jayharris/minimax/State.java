@@ -18,13 +18,6 @@ public interface State<S extends State<S, A>, A extends Action<S, A>> {
     Collection<A> actions();
 
     /**
-     * Evaluate this state.
-     *
-     * @return a heuristic value for this state, or a utility value if this is a terminal state
-     */
-    double eval();
-
-    /**
      * Test if this is a terminal state.
      *
      * @return true iff this is a terminal state.

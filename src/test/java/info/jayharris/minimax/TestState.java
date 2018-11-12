@@ -8,10 +8,8 @@ public class TestState implements State<TestState, TestAction> {
     private final String id;
 
     private Collection<TestAction> actions;
-    private double heuristicValue;
+    public double heuristicValue;
     private boolean isTerminal;
-
-    private int evalCount = 0;
 
     public TestState(String id, Collection<TestAction> actions, double heuristicValue) {
         this.id = id;
@@ -24,12 +22,6 @@ public class TestState implements State<TestState, TestAction> {
     @Override
     public Collection<TestAction> actions() {
         return actions;
-    }
-
-    @Override
-    public double eval() {
-        evalCount++;
-        return heuristicValue;
     }
 
     @Override
