@@ -10,11 +10,11 @@ public class DecisionTree<S extends State<S, A>, A extends Action<S, A>> {
     private final CutoffTest<S> cutoffTest;
 
     public DecisionTree(
-            Node<S, A> root,
+            S currentState,
             Transpositions<S> transpositions,
             HeuristicEvaluationFunction<S> heuristicFunction,
             CutoffTest<S> cutoffTest) {
-        this.root = root;
+        this.root = Node.root(currentState);
         this.transpositions = transpositions;
         this.heuristicFunction = heuristicFunction;
         this.cutoffTest = cutoffTest;

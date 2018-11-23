@@ -8,14 +8,20 @@ public class TestState implements State<TestState, TestAction> {
     private final String id;
 
     private Collection<TestAction> actions;
-    public double heuristicValue;
+    public Double heuristicValue;
+    private boolean isCutoff;
     private boolean isTerminal;
 
-    public TestState(String id, Collection<TestAction> actions, double heuristicValue) {
+    public TestState(String id, Collection<TestAction> actions, Double heuristicValue) {
+        this(id, actions, heuristicValue, false);
+    }
+
+    public TestState(String id, Collection<TestAction> actions, Double heuristicValue, boolean isCutoff) {
         this.id = id;
 
         this.actions = actions;
         this.heuristicValue = heuristicValue;
+        this.isCutoff = isCutoff;
         this.isTerminal = actions.isEmpty();
     }
 
@@ -42,6 +48,10 @@ public class TestState implements State<TestState, TestAction> {
     }
 
     static TestState nonTerminalState(String id, Collection<TestAction> actions) {
-        return new TestState(id, actions, Double.NaN);
+        return new TestState(id, actions, null);
+    }
+
+    static TestState cutoffTestState(String id, Collection<TestAction> actions, double heuristicValue) {
+        return new TestState(id, actions, heuristicValue, true);
     }
 }
