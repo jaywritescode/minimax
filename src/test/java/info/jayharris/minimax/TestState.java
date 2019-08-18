@@ -6,23 +6,19 @@ import java.util.Collections;
 public class TestState implements State<TestState, TestAction> {
 
     private final String id;
+    private final Collection<TestAction> actions;
+    private final double utility;
 
-    private Collection<TestAction> actions;
-    public Double heuristicValue;
-    private boolean isCutoff;
-    private boolean isTerminal;
-
-    public TestState(String id, Collection<TestAction> actions, Double heuristicValue) {
-        this(id, actions, heuristicValue, false);
+    private TestState(String id, double utility) {
+        this.id = id;
+        this.actions = Collections.emptySet();
+        this.utility = utility;
     }
 
-    public TestState(String id, Collection<TestAction> actions, Double heuristicValue, boolean isCutoff) {
+    private TestState(String id, Collection<TestAction> actions) {
         this.id = id;
-
         this.actions = actions;
-        this.heuristicValue = heuristicValue;
-        this.isCutoff = isCutoff;
-        this.isTerminal = actions.isEmpty();
+        this.utility = Double.NaN;
     }
 
     @Override
@@ -32,26 +28,18 @@ public class TestState implements State<TestState, TestAction> {
 
     @Override
     public boolean terminalTest() {
-        return isTerminal;
+        return actions().isEmpty();
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("TestState{");
-        sb.append("id='").append(id).append('\'');
-        sb.append('}');
-        return sb.toString();
+    public double getUtility() {
+        return utility;
     }
 
-    static TestState terminalState(String id, double heuristicValue) {
-        return new TestState(id, Collections.emptyList(), heuristicValue);
+    public static TestState terminalState(String id, double utility) {
+        return new TestState(id, utility);
     }
 
-    static TestState nonTerminalState(String id, Collection<TestAction> actions) {
-        return new TestState(id, actions, null);
-    }
-
-    static TestState cutoffTestState(String id, Collection<TestAction> actions, double heuristicValue) {
-        return new TestState(id, actions, heuristicValue, true);
+    public static TestState nonTerminalState(String id, Collection<TestAction> actions) {
+        return new TestState(id, actions);
     }
 }
