@@ -3,7 +3,7 @@ package info.jayharris.minimax;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MaxNode<S extends State<S, A>, A extends Action<S, A>> extends SimpleNode<S, A> {
+public class MaxNode<S extends State<S, A>, A extends Action<S, A>> extends AbstractNode<S, A> {
 
     public MaxNode(S state, A action, int depth, EvaluationFunction<S> utility) {
         super(state, action, depth, utility);
@@ -15,7 +15,7 @@ public class MaxNode<S extends State<S, A>, A extends Action<S, A>> extends Simp
         }
 
         double v = Double.NEGATIVE_INFINITY;
-        for (SimpleNode<S, A> succ : successors.get()) {
+        for (AbstractNode<S, A> succ : successors.get()) {
             v = Double.max(v, succ.getValue());
         }
         return v;

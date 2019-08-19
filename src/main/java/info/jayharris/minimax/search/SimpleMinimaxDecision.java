@@ -1,8 +1,8 @@
 package info.jayharris.minimax.search;
 
+import info.jayharris.minimax.AbstractNode;
 import info.jayharris.minimax.Action;
 import info.jayharris.minimax.MaxNode;
-import info.jayharris.minimax.SimpleNode;
 import info.jayharris.minimax.State;
 
 /**
@@ -23,7 +23,7 @@ public class SimpleMinimaxDecision<S extends State<S, A>, A extends Action<S, A>
         return root.successors().stream()
                 .filter(node -> node.value() == v)
                 .findFirst()
-                .map(SimpleNode::getAction)
+                .map(AbstractNode::getAction)
                 .orElseThrow(RuntimeException::new);
     }
 }
