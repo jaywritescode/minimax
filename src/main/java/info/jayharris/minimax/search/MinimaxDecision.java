@@ -16,8 +16,6 @@ import java.util.function.Predicate;
  */
 public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S, A>> implements Search<S, A> {
 
-    private final Predicate<AbstractNode<S, A>> cutoffTest;
-    private final EvaluationFunction<S> heuristic;
     private final NodeFactory<S, A> nodeFactory;
 
     /**
@@ -30,10 +28,7 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
      *                  state with respect to the player using this search
      */
     protected MinimaxDecision(Predicate<AbstractNode<S, A>> cutoffTest, EvaluationFunction<S> heuristic) {
-        this.cutoffTest = cutoffTest;
-        this.heuristic = heuristic;
-
-        this.nodeFactory = new NodeFactory<>(this::utility);
+        this.nodeFactory = new NodeFactory<>(this::utility, cutoffTest, heuristic);
     }
 
     /**

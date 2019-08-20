@@ -1,11 +1,19 @@
 package info.jayharris.minimax;
 
+import java.util.function.Predicate;
+
 public class NodeFactory<S extends State<S, A>, A extends Action<S, A>> {
 
     private final EvaluationFunction<S> utility;
+    private final Predicate<AbstractNode<S, A>> cutoffTest;
+    private final EvaluationFunction<S> heuristic;
 
-    public NodeFactory(EvaluationFunction<S> utility) {
+    public NodeFactory(EvaluationFunction<S> utility,
+                       Predicate<AbstractNode<S, A>> cutoffTest,
+                       EvaluationFunction<S> heuristic) {
         this.utility = utility;
+        this.cutoffTest = cutoffTest;
+        this.heuristic = heuristic;
     }
 
     public MaxNode<S, A> createMaxNode(S state, A action, int depth) {
