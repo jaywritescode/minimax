@@ -18,6 +18,7 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
 
     private final Predicate<AbstractNode<S, A>> cutoffTest;
     private final EvaluationFunction<S> heuristic;
+    private final NodeFactory<S, A> nodeFactory;
 
     /**
      * Constructor.
@@ -31,6 +32,8 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
     protected MinimaxDecision(Predicate<AbstractNode<S, A>> cutoffTest, EvaluationFunction<S> heuristic) {
         this.cutoffTest = cutoffTest;
         this.heuristic = heuristic;
+
+        this.nodeFactory = new NodeFactory<>(this::utility);
     }
 
     /**
@@ -40,7 +43,7 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
      * @return an action
      */
     public A perform(S initialState) {
-        return perform(new MaxNode<>(initialState, null, 0, this::utility));
+        return perform(nodeFactory.createMaxNode(initialState, null, 0));
     }
 
     private A perform(AbstractNode<S, A> root) {

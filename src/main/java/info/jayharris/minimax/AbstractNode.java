@@ -16,17 +16,20 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
     final S state;
     private final A action;
     final int depth;
-    final EvaluationFunction<S> utility;
 
+    final NodeFactory<S, A> nodeFactory;
+
+    final EvaluationFunction<S> utility;
     final Supplier<Set<? extends AbstractNode<S, A>>> successors;
     private final Supplier<Double> value;
 
-    AbstractNode(S state, A action, int depth, EvaluationFunction<S> utility) {
+    AbstractNode(S state, A action, int depth, NodeFactory<S, A> nodeFactory) {
         this.state = state;
         this.action = action;
         this.depth = depth;
-        this.utility = utility;
+        this.nodeFactory = nodeFactory;
 
+        utility = nodeFactory.getUtility();
         successors = Suppliers.memoize(this::getSuccessors);
         value = Suppliers.memoize(this::getValue);
     }

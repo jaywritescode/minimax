@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 public class MaxNode<S extends State<S, A>, A extends Action<S, A>> extends AbstractNode<S, A> {
 
-    public MaxNode(S state, A action, int depth, EvaluationFunction<S> utility) {
-        super(state, action, depth, utility);
+    MaxNode(S state, A action, int depth, NodeFactory<S, A> nodeFactory) {
+        super(state, action, depth, nodeFactory);
     }
 
     double getValue() {
@@ -26,6 +26,6 @@ public class MaxNode<S extends State<S, A>, A extends Action<S, A>> extends Abst
     }
 
     private MinNode<S, A> successorNode(A action) {
-        return new MinNode<>(action.apply(state), action, depth + 1, utility);
+        return nodeFactory.createMinNode(action.apply(state), action, depth + 1);
     }
 }
