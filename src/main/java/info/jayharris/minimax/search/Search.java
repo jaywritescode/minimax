@@ -4,5 +4,8 @@ import info.jayharris.minimax.Action;
 import info.jayharris.minimax.State;
 
 public interface Search<S extends State<S, A>, A extends Action<S, A>> {
-    A perform();
+
+    A perform(S initialState);
+
+    double utility(S state);
 }

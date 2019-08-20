@@ -1,6 +1,5 @@
 package info.jayharris.minimax.search;
 
-import info.jayharris.minimax.MaxNode;
 import info.jayharris.minimax.TestAction;
 import info.jayharris.minimax.TestState;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SimpleMinimaxDecisionTest {
+class MinimaxDecisionTest {
 
     @Test
     void perform() {
@@ -50,10 +49,13 @@ class SimpleMinimaxDecisionTest {
                 new TestAction(D)
         ));
 
-        MaxNode<TestState, TestAction> root =
-                new MaxNode(A, null, 0, state -> ((TestState) state).getUtility());
-        SimpleMinimaxDecision<TestState, TestAction> decision = new SimpleMinimaxDecision<>(root);
+        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>(x -> false, x -> 0.0) {
+            @Override
+            public double utility(TestState state) {
+                return state.getUtility();
+            }
+        };
 
-        assertThat(decision.perform()).isSameAs(optimal);
+        assertThat(decision.perform(A)).isSameAs(optimal);
     }
 }
