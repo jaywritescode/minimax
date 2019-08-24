@@ -42,12 +42,14 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
     }
 
     private A perform(AbstractNode<S, A> root) {
-        double v = root.value();
+        double v = root.getValue();
 
-        return root.successors().stream()
-                .filter(node -> node.value() == v)
+        return root.getSuccessors().stream()
+                .filter(node -> node.getValue() == v)
                 .findFirst()
                 .map(AbstractNode::getAction)
                 .orElseThrow(RuntimeException::new);
     }
+
+
 }

@@ -20,8 +20,8 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
     final NodeFactory<S, A> nodeFactory;
 
     final EvaluationFunction<S> utility;
-    final Supplier<Set<? extends AbstractNode<S, A>>> successors;
-    private final Supplier<Double> value;
+    final Supplier<Set<? extends AbstractNode<S, A>>> successorsSupplier;
+    private final Supplier<Double> valueSupplier;
 
     AbstractNode(S state, A action, int depth, NodeFactory<S, A> nodeFactory) {
         this.state = state;
@@ -30,8 +30,8 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
         this.nodeFactory = nodeFactory;
 
         utility = nodeFactory.getUtility();
-        successors = Suppliers.memoize(this::getSuccessors);
-        value = Suppliers.memoize(this::getValue);
+        successorsSupplier = Suppliers.memoize(this::successors);
+        valueSupplier = Suppliers.memoize(this::value);
     }
 
     /**
@@ -40,8 +40,8 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
      *
      * @return a set of successor nodes
      */
-    public Set<? extends AbstractNode<S, A>> successors() {
-        return successors.get();
+    public Set<? extends AbstractNode<S, A>> getSuccessors() {
+        return successorsSupplier.get();
     }
 
     /**
@@ -49,14 +49,29 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
      *
      * @return a utility value
      */
-    public double value() {
-        return value.get();
+    public double getValue() {
+        return valueSupplier.get();
     }
 
-    abstract Set<? extends AbstractNode<S, A>> getSuccessors();
+    /**
+     * Calculates the successors of {@code this.state} for memoization.
+     *
+     * @return a set of successor nodes
+     */
+    abstract Set<? extends AbstractNode<S, A>> successors();
 
-    abstract double getValue();
+    /**
+     * Calculates the (possibly estimated) utility value of {@code this.state} for memoization.
+     *
+     * @return a utility value
+     */
+    abstract double value();
 
+    /**
+     * Gets the state wrapped by this node.
+     *
+     * @return a state
+     */
     public S getState() {
         return state;
     }

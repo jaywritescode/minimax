@@ -9,19 +9,19 @@ public class MinNode<S extends State<S, A>, A extends Action<S, A>> extends Abst
         super(state, action, depth, nodeFactory);
     }
 
-    double getValue() {
+    double value() {
         if (state.terminalTest()) {
             return utility();
         }
 
         double v = Double.POSITIVE_INFINITY;
-        for (AbstractNode<S, A> succ : successors.get()) {
-            v = Double.min(v, succ.getValue());
+        for (AbstractNode<S, A> succ : successorsSupplier.get()) {
+            v = Double.min(v, succ.value());
         }
         return v;
     }
 
-    public Set<MaxNode<S, A>> getSuccessors() {
+    public Set<MaxNode<S, A>> successors() {
         return state.actions().stream().map(this::successorNode).collect(Collectors.toSet());
     }
 
