@@ -3,7 +3,9 @@ package info.jayharris.minimax;
 import com.google.common.base.Suppliers;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 
 /**
  * A node encapsulates a state and action in the decision tree.
@@ -11,27 +13,29 @@ import java.util.function.Supplier;
  * @param <S> a State, a wrapper around a game state
  * @param <A> an Action, a wrapper around a game move
  */
-public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>> {
+public class Node<S extends State<S, A>, A extends Action<S, A>> {
 
-    final S state;
+    private final S state;
     private final A action;
-    final int depth;
+    private final int depth;
+    private final NodeType nodeType;
 
-    final NodeFactory<S, A> nodeFactory;
-
-    final EvaluationFunction<S> utility;
-    final Supplier<Set<? extends AbstractNode<S, A>>> successorsSupplier;
+    private final Supplier<Set<Node<S, A>>> successorsSupplier;
     private final Supplier<Double> valueSupplier;
 
-    AbstractNode(S state, A action, int depth, NodeFactory<S, A> nodeFactory) {
+    Node(S state,
+         A action,
+         int depth,
+         NodeType nodeType,
+         Function<Node<S, A>, Set<Node<S, A>>> successorsFunction,
+         ToDoubleFunction<Node<S, A>> valueFunction) {
         this.state = state;
         this.action = action;
         this.depth = depth;
-        this.nodeFactory = nodeFactory;
+        this.nodeType = nodeType;
 
-        utility = nodeFactory.getUtility();
-        successorsSupplier = Suppliers.memoize(this::successors);
-        valueSupplier = Suppliers.memoize(this::value);
+        successorsSupplier = Suppliers.memoize(() -> successorsFunction.apply(this));
+        valueSupplier = Suppliers.memoize(() -> valueFunction.applyAsDouble(this));
     }
 
     /**
@@ -40,32 +44,18 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
      *
      * @return a set of successor nodes
      */
-    public Set<? extends AbstractNode<S, A>> getSuccessors() {
+    public Set<Node<S, A>> getSuccessors() {
         return successorsSupplier.get();
     }
 
     /**
-     * Gets the utility value of this node's state.
+     * Gets the utility or estimated utility of this state.
      *
      * @return a utility value
      */
     public double getValue() {
         return valueSupplier.get();
     }
-
-    /**
-     * Calculates the successors of {@code this.state} for memoization.
-     *
-     * @return a set of successor nodes
-     */
-    abstract Set<? extends AbstractNode<S, A>> successors();
-
-    /**
-     * Calculates the (possibly estimated) utility value of {@code this.state} for memoization.
-     *
-     * @return a utility value
-     */
-    abstract double value();
 
     /**
      * Gets the state wrapped by this node.
@@ -89,7 +79,7 @@ public abstract class AbstractNode<S extends State<S, A>, A extends Action<S, A>
         return depth;
     }
 
-    double utility() {
-        return utility.apply(state);
+    public NodeType getNodeType() {
+        return nodeType;
     }
 }
