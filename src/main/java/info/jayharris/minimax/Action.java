@@ -12,7 +12,7 @@ public interface Action<S extends State<S, A>, A extends Action<S, A>> {
      * Apply this action to the given state.
      *
      * @param initialState the game state
-     * @return a successors state
+     * @return a successor state
      */
-    S apply(S initialState);
+    S perform(S initialState);
 }

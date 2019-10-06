@@ -9,7 +9,7 @@ public class TestAction implements Action<TestState, TestAction> {
     }
 
     @Override
-    public TestState apply(TestState initialState) {
+    public TestState perform(TestState initialState) {
         return successor;
     }
 }

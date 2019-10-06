@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MinimaxDecisionTest {
+class AlphaBetaPruningSearchTest {
 
     @Test
     void perform() {
@@ -49,7 +49,7 @@ class MinimaxDecisionTest {
                 new TestAction(D)
         ));
 
-        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>() {
+        AlphaBetaPruningSearch<TestState, TestAction> decision = new AlphaBetaPruningSearch<TestState, TestAction>() {
             @Override
             public double utility(TestState state) {
                 return state.getUtility();
@@ -57,5 +57,6 @@ class MinimaxDecisionTest {
         };
 
         assertThat(decision.perform(A)).isSameAs(optimal);
+        // assert that nodes that don't need to be expanded are not expanded
     }
 }

@@ -5,6 +5,8 @@ import java.util.Collection;
 /**
  * Represents a state in the game.
  *
+ * Note: We assume that the game has two players who always alternate turns.
+ *
  * @param <S> the type of State
  * @param <A> the type of Action
  */
