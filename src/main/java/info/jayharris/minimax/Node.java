@@ -53,11 +53,13 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
         return valueSupplier.get();
     }
 
-    public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> createRootNode(S state, ToDoubleFunction<Node<S, A>> childrenFn) {
+    public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> createRootNode(
+            S state, ToDoubleFunction<Node<S, A>> childrenFn) {
         return new Node<>(state, childrenFn);
     }
 
-    public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> createSuccessor(Node<S, A> parent, A action, ToDoubleFunction<Node<S, A>> childrenFn) {
+    public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> createSuccessor(
+            Node<S, A> parent, A action, ToDoubleFunction<Node<S, A>> childrenFn) {
         Node<S, A> successor = new Node<>(parent, action, childrenFn);
         parent.successors.add(successor);
         return successor;
