@@ -1,10 +1,9 @@
 package info.jayharris.minimax.search;
 
-import info.jayharris.minimax.Action;
-import info.jayharris.minimax.Node;
-import info.jayharris.minimax.State;
+import info.jayharris.minimax.*;
 
 import java.util.Comparator;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Minimax search algorithm implementation.
@@ -13,6 +12,18 @@ import java.util.Comparator;
  * @param <A> the type of Action
  */
 public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S, A>> implements Search<S, A> {
+
+    CutoffTest<S, A> cutoffTest;
+    ToDoubleFunction<S> heuristicFn;
+
+    MinimaxDecision(ToDoubleFunction<S> heuristicFn) {
+        this(FalseCutoffTest.getInstance(), heuristicFn);
+    }
+
+    MinimaxDecision(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristicFn) {
+        this.cutoffTest = cutoffTest;
+        this.heuristicFn = heuristicFn;
+    }
 
     @Override
     public A perform(S initialState) {
@@ -36,6 +47,10 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
             return utility(state);
         }
 
+        if (cutoffTest.cutoffSearch(node)) {
+            return heuristicFn.applyAsDouble(state);
+        }
+
         return state.actions().stream()
                 .map(action -> Node.createSuccessor(node, action, this::minValue))
                 .max(Comparator.comparingDouble(Node::getValue))
@@ -48,6 +63,10 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
 
         if (state.terminalTest()) {
             return utility(state);
+        }
+
+        if (cutoffTest.cutoffSearch(node)) {
+            return heuristicFn.applyAsDouble(state);
         }
 
         return state.actions().stream()
