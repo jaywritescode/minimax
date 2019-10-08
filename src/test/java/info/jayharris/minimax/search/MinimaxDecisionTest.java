@@ -49,7 +49,7 @@ class MinimaxDecisionTest {
                 new TestAction(D)
         ));
 
-        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>() {
+        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>(node -> 0.0) {
             @Override
             public double utility(TestState state) {
                 return state.getUtility();

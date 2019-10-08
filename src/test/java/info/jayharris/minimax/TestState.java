@@ -9,6 +9,8 @@ public class TestState implements State<TestState, TestAction> {
     private final Collection<TestAction> actions;
     private final double utility;
 
+    private int utilityCalculated = 0;
+
     private TestState(String id, double utility) {
         this.id = id;
         this.actions = Collections.emptySet();
@@ -32,7 +34,12 @@ public class TestState implements State<TestState, TestAction> {
     }
 
     public double getUtility() {
+        ++utilityCalculated;
         return utility;
+    }
+
+    public int getUtilityCalculated() {
+        return utilityCalculated;
     }
 
     public static TestState terminalState(String id, double utility) {

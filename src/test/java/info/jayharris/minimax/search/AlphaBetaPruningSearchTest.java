@@ -58,5 +58,7 @@ class AlphaBetaPruningSearchTest {
 
         assertThat(decision.perform(A)).isSameAs(optimal);
         // assert that nodes that don't need to be expanded are not expanded
+        assertThat(c2.getUtilityCalculated()).isZero();
+        assertThat(c3.getUtilityCalculated()).isZero();
     }
 }
