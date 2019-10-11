@@ -7,21 +7,20 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 class AlphaBetaPruningSearchTest {
 
     @Test
     void perform() {
-        TestState A, B, C, D, b1, b2, b3, c1, c2, c3, d1, d2, d3;
-        TestAction optimal;
+        TestState A, B, C, D, b1, b2, b3, c1, d1, d2, d3;
+        TestAction optimal, c2, c3;
 
         b1 = TestState.terminalState("b1", 3);
         b2 = TestState.terminalState("b2", 12);
         b3 = TestState.terminalState("b3", 8);
 
         c1 = TestState.terminalState("c1", 2);
-        c2 = TestState.terminalState("c2", 4);
-        c3 = TestState.terminalState("c3", 6);
 
         d1 = TestState.terminalState("d1", 14);
         d2 = TestState.terminalState("d2", 5);
@@ -34,8 +33,8 @@ class AlphaBetaPruningSearchTest {
         ));
         C = TestState.nonTerminalState("C", Arrays.asList(
                 new TestAction(c1),
-                new TestAction(c2),
-                new TestAction(c3)
+                c2 = mock(TestAction.class),
+                c3 = mock(TestAction.class)
         ));
         D = TestState.nonTerminalState("D", Arrays.asList(
                 new TestAction(d1),
@@ -58,7 +57,7 @@ class AlphaBetaPruningSearchTest {
 
         assertThat(decision.perform(A)).isSameAs(optimal);
         // assert that nodes that don't need to be expanded are not expanded
-        assertThat(c2.getUtilityCalculated()).isZero();
-        assertThat(c3.getUtilityCalculated()).isZero();
+        verify(c2, never()).perform(any());
+        verify(c3, never()).perform(any());
     }
 }

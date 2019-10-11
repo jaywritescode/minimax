@@ -53,6 +53,10 @@ public class Node<S extends State<S, A>, A extends Action<S, A>> {
         return valueSupplier.get();
     }
 
+    public int getDepth() {
+        return depth;
+    }
+
     public static <S extends State<S, A>, A extends Action<S, A>> Node<S, A> createRootNode(
             S state, ToDoubleFunction<Node<S, A>> childrenFn) {
         return new Node<>(state, childrenFn);
