@@ -48,7 +48,7 @@ class AlphaBetaPruningSearchTest {
                 new TestAction(D)
         ));
 
-        AlphaBetaPruningSearch<TestState, TestAction> decision = new AlphaBetaPruningSearch<TestState, TestAction>() {
+        AlphaBetaPruningSearch<TestState, TestAction> decision = new AlphaBetaPruningSearch<TestState, TestAction>(node -> 0.0) {
             @Override
             public double utility(TestState state) {
                 return state.getUtility();

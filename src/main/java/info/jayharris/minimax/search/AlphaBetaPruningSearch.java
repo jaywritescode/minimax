@@ -1,8 +1,6 @@
 package info.jayharris.minimax.search;
 
-import info.jayharris.minimax.Action;
-import info.jayharris.minimax.Node;
-import info.jayharris.minimax.State;
+import info.jayharris.minimax.*;
 
 import java.util.function.ToDoubleFunction;
 
@@ -13,6 +11,18 @@ import java.util.function.ToDoubleFunction;
  * @param <A> the type of Action
  */
 public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Action<S, A>> implements Search<S, A> {
+
+    CutoffTest<S, A> cutoffTest;
+    ToDoubleFunction<S> heuristic;
+
+    AlphaBetaPruningSearch(ToDoubleFunction<S> heuristic) {
+        this(FalseCutoffTest.getInstance(), heuristic);
+    }
+
+    AlphaBetaPruningSearch(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristic) {
+        this.cutoffTest = cutoffTest;
+        this.heuristic = heuristic;
+    }
 
     @Override
     public A perform(S initialState) {
@@ -50,6 +60,10 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
                 return utility(state);
             }
 
+            if (cutoffTest.cutoffSearch(node)) {
+                return heuristic.applyAsDouble(state);
+            }
+
             double v = Double.NEGATIVE_INFINITY;
             for (A action : state.actions()) {
                 Node<S, A> successor = Node.createSuccessor(node, action, new MinValueFunction(alpha, beta));
@@ -78,6 +92,10 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
 
             if (state.terminalTest()) {
                 return utility(state);
+            }
+
+            if (cutoffTest.cutoffSearch(node)) {
+                return heuristic.applyAsDouble(state);
             }
 
             double v = Double.POSITIVE_INFINITY;
