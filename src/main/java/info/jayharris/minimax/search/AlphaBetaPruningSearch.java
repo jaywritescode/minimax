@@ -15,11 +15,11 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
     CutoffTest<S, A> cutoffTest;
     ToDoubleFunction<S> heuristic;
 
-    AlphaBetaPruningSearch(ToDoubleFunction<S> heuristic) {
+    public AlphaBetaPruningSearch(ToDoubleFunction<S> heuristic) {
         this(FalseCutoffTest.getInstance(), heuristic);
     }
 
-    AlphaBetaPruningSearch(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristic) {
+    public AlphaBetaPruningSearch(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristic) {
         this.cutoffTest = cutoffTest;
         this.heuristic = heuristic;
     }

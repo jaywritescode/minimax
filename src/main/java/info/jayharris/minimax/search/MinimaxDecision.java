@@ -16,11 +16,11 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
     CutoffTest<S, A> cutoffTest;
     ToDoubleFunction<S> heuristicFn;
 
-    MinimaxDecision(ToDoubleFunction<S> heuristicFn) {
+    public MinimaxDecision(ToDoubleFunction<S> heuristicFn) {
         this(FalseCutoffTest.getInstance(), heuristicFn);
     }
 
-    MinimaxDecision(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristicFn) {
+    public MinimaxDecision(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristicFn) {
         this.cutoffTest = cutoffTest;
         this.heuristicFn = heuristicFn;
     }
