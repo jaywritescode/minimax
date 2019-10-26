@@ -27,6 +27,7 @@ public interface Search<S extends State<S, A>, A extends Action<S, A>> {
      *
      * @param state a state
      * @return the utility of the state
+     * @throws UnknownUtilityException if {@code state} isn't a terminal state
      */
-    double utility(S state);
+    double utility(S state) throws UnknownUtilityException;
 }
