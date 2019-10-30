@@ -1,4 +1,4 @@
-package info.jayharris.minimax;
+package info.jayharris.minimax.search;
 
 public class FalseCutoffTest extends CutoffTest {
 

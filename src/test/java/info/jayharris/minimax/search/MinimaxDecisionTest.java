@@ -1,6 +1,5 @@
 package info.jayharris.minimax.search;
 
-import info.jayharris.minimax.CutoffTest;
 import info.jayharris.minimax.Node;
 import info.jayharris.minimax.TestAction;
 import info.jayharris.minimax.TestState;

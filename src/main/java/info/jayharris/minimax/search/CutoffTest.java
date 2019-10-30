@@ -1,4 +1,8 @@
-package info.jayharris.minimax;
+package info.jayharris.minimax.search;
+
+import info.jayharris.minimax.Action;
+import info.jayharris.minimax.Node;
+import info.jayharris.minimax.State;
 
 import java.util.function.Predicate;
 
