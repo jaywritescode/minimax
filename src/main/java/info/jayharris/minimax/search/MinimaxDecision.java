@@ -3,6 +3,7 @@ package info.jayharris.minimax.search;
 import info.jayharris.minimax.*;
 
 import java.util.Comparator;
+import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -13,16 +14,23 @@ import java.util.function.ToDoubleFunction;
  */
 public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S, A>> implements Search<S, A> {
 
-    CutoffTest<S, A> cutoffTest;
-    ToDoubleFunction<S> heuristicFn;
+    private final ToDoubleFunction<S> heuristicFn;
+    private final CutoffTest<S, A> cutoffTest;
+    private final TranspositionTable<S, A> transpositionTable;
 
     public MinimaxDecision(ToDoubleFunction<S> heuristicFn) {
-        this(FalseCutoffTest.getInstance(), heuristicFn);
+        this(heuristicFn, FalseCutoffTest.getInstance());
     }
 
-    public MinimaxDecision(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristicFn) {
+    public MinimaxDecision(ToDoubleFunction<S> heuristicFn, CutoffTest<S, A> cutoffTest) {
+        this(heuristicFn, cutoffTest, NilTranspositionTable.getInstance());
+    }
+
+    public MinimaxDecision(ToDoubleFunction<S> heuristicFn, CutoffTest<S, A> cutoffTest,
+                           TranspositionTable<S, A> transpositionTable) {
         this.cutoffTest = cutoffTest;
         this.heuristicFn = heuristicFn;
+        this.transpositionTable = transpositionTable;
     }
 
     @Override
@@ -43,36 +51,54 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
     private double maxValue(Node<S, A> node) {
         S state = node.getState();
 
+        OptionalDouble t;
+        if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
+            return t.getAsDouble();
+        }
+
+        double value;
         if (state.terminalTest()) {
-            return utility(state);
+            value = utility(state);
+        }
+        else if (cutoffTest.cutoffSearch(node)) {
+            value = heuristicFn.applyAsDouble(state);
+        }
+        else {
+            value = state.actions().stream()
+                    .map(action -> Node.createSuccessor(node, action, this::minValue))
+                    .max(Comparator.comparingDouble(Node::getValue))
+                    .map(Node::getValue)
+                    .get();
         }
 
-        if (cutoffTest.cutoffSearch(node)) {
-            return heuristicFn.applyAsDouble(state);
-        }
-
-        return state.actions().stream()
-                .map(action -> Node.createSuccessor(node, action, this::minValue))
-                .max(Comparator.comparingDouble(Node::getValue))
-                .map(Node::getValue)
-                .get();
+        transpositionTable.setUtilityValue(state, value);
+        return value;
     }
 
     private double minValue(Node<S, A> node) {
         S state = node.getState();
 
+        OptionalDouble t;
+        if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
+            return t.getAsDouble();
+        }
+
+        double value;
         if (state.terminalTest()) {
-            return utility(state);
+            value = utility(state);
+        }
+        else if (cutoffTest.cutoffSearch(node)) {
+            value = heuristicFn.applyAsDouble(state);
+        }
+        else {
+            value = state.actions().stream()
+                    .map(action -> Node.createSuccessor(node, action, this::maxValue))
+                    .min(Comparator.comparingDouble(Node::getValue))
+                    .map(Node::getValue)
+                    .get();
         }
 
-        if (cutoffTest.cutoffSearch(node)) {
-            return heuristicFn.applyAsDouble(state);
-        }
-
-        return state.actions().stream()
-                .map(action -> Node.createSuccessor(node, action, this::maxValue))
-                .min(Comparator.comparingDouble(Node::getValue))
-                .map(Node::getValue)
-                .get();
+        transpositionTable.setUtilityValue(state, value);
+        return value;
     }
 }

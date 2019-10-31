@@ -9,6 +9,8 @@ public class TestState implements State<TestState, TestAction> {
     private final Collection<TestAction> actions;
     private final double utility;
 
+    public int countActionsCalls = 0;
+
     private TestState(String id, double utility) {
         this.id = id;
         this.actions = Collections.emptySet();
@@ -23,6 +25,7 @@ public class TestState implements State<TestState, TestAction> {
 
     @Override
     public Collection<TestAction> actions() {
+        ++countActionsCalls;
         return actions;
     }
 

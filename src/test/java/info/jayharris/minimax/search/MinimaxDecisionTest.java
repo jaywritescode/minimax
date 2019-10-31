@@ -95,7 +95,8 @@ class MinimaxDecisionTest {
             }
         };
 
-        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>(cutoffTest, heuristic) {
+        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>(heuristic,
+                                                                                                     cutoffTest) {
             @Override
             public double utility(TestState state) {
                 return state.getUtility();
@@ -115,5 +116,29 @@ class MinimaxDecisionTest {
         assertThat(decision.perform(A)).isSameAs(optimal);
         // We should not expand node D because the terminal test obtained at its parent node.
         verify(unexamined, never()).perform(any());
+    }
+
+    @Test
+    @DisplayName("it doesn't expand nodes whose utility values have already been calculated")
+    void testTranspositionTable() {
+        TestState A, b1, b2, c1, c2, D;
+
+        D = TestState.terminalState("D", 5.0);
+        c1 = TestState.nonTerminalState("c1", Arrays.asList(new TestAction(D)));
+        c2 = TestState.nonTerminalState("c2", Arrays.asList(new TestAction(D)));
+        b1 = TestState.nonTerminalState("b1", Arrays.asList(new TestAction(c1)));
+        b2 = TestState.nonTerminalState("b2", Arrays.asList(new TestAction(c2)));
+        A = TestState.nonTerminalState("A", Arrays.asList(new TestAction(b1), new TestAction(b2)));
+
+        MinimaxDecision<TestState, TestAction> decision = new MinimaxDecision<TestState, TestAction>(
+                node -> 0.0, FalseCutoffTest.getInstance(), MapBackedTranspositionTable.create()) {
+            @Override
+            public double utility(TestState state) {
+                return state.getUtility();
+            }
+        };
+
+        decision.perform(A);
+        assertThat(D.countActionsCalls).isEqualTo(1);
     }
 }
