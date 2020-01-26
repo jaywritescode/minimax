@@ -67,7 +67,7 @@ class MinimaxDecisionTest {
 
         CutoffTest<TestState, TestAction> cutoffTest = new CutoffTest<TestState, TestAction>() {
             @Override
-            public boolean test(Node<TestState, TestAction> node) {
+            public boolean cutoffSearch(Node<TestState, TestAction> node) {
                 return node.getDepth() >= 2;
             }
         };

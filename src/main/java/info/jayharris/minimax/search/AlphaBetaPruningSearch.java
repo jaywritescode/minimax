@@ -2,6 +2,7 @@ package info.jayharris.minimax.search;
 
 import info.jayharris.minimax.*;
 
+import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -14,14 +15,21 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
 
     CutoffTest<S, A> cutoffTest;
     ToDoubleFunction<S> heuristic;
+    TranspositionTable<S, A> transpositionTable;
 
     public AlphaBetaPruningSearch(ToDoubleFunction<S> heuristic) {
         this(FalseCutoffTest.getInstance(), heuristic);
     }
 
     public AlphaBetaPruningSearch(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristic) {
+        this(cutoffTest, heuristic, NilTranspositionTable.getInstance());
+    }
+
+    public AlphaBetaPruningSearch(CutoffTest<S, A> cutoffTest, ToDoubleFunction<S> heuristic,
+                                  TranspositionTable<S, A> transpositionTable) {
         this.cutoffTest = cutoffTest;
         this.heuristic = heuristic;
+        this.transpositionTable = transpositionTable;
     }
 
     @Override
@@ -56,6 +64,11 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
         public double applyAsDouble(Node<S, A> node) {
             S state = node.getState();
 
+            OptionalDouble t;
+            if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
+                return t.getAsDouble();
+            }
+
             if (state.terminalTest()) {
                 return utility(state);
             }
@@ -70,10 +83,12 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
                 v = Math.max(v, successor.getValue());
 
                 if (v >= beta) {
+                    transpositionTable.setUtilityValue(state, v);
                     return v;
                 }
                 alpha = Math.max(alpha, v);
             }
+            transpositionTable.setUtilityValue(state, v);
             return v;
         }
     }
@@ -90,6 +105,11 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
         public double applyAsDouble(Node<S, A> node) {
             S state = node.getState();
 
+            OptionalDouble t;
+            if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
+                return t.getAsDouble();
+            }
+
             if (state.terminalTest()) {
                 return utility(state);
             }
@@ -104,10 +124,12 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
                 v = Math.min(v, successor.getValue());
 
                 if (v <= alpha) {
+                    transpositionTable.setUtilityValue(state, v);
                     return v;
                 }
                 beta = Math.min(beta, v);
             }
+            transpositionTable.setUtilityValue(state, v);
             return v;
         }
     }

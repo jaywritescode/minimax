@@ -1,5 +1,7 @@
 package info.jayharris.minimax.search;
 
+import info.jayharris.minimax.Node;
+
 public class FalseCutoffTest extends CutoffTest {
 
     static FalseCutoffTest instance = null;
@@ -7,7 +9,7 @@ public class FalseCutoffTest extends CutoffTest {
     private FalseCutoffTest() { }
 
     @Override
-    public boolean test(Object o) {
+    public boolean cutoffSearch(Node node) {
         return false;
     }
 
