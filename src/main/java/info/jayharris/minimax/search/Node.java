@@ -1,6 +1,8 @@
-package info.jayharris.minimax;
+package info.jayharris.minimax.search;
 
 import com.google.common.base.Suppliers;
+import info.jayharris.minimax.Action;
+import info.jayharris.minimax.State;
 
 import java.util.Collection;
 import java.util.HashSet;

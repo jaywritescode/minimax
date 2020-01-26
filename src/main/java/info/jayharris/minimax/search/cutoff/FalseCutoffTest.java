@@ -1,6 +1,6 @@
-package info.jayharris.minimax.search;
+package info.jayharris.minimax.search.cutoff;
 
-import info.jayharris.minimax.Node;
+import info.jayharris.minimax.search.Node;
 
 public class FalseCutoffTest extends CutoffTest {
 

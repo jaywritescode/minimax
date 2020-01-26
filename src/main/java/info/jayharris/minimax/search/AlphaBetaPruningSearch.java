@@ -1,6 +1,8 @@
 package info.jayharris.minimax.search;
 
 import info.jayharris.minimax.*;
+import info.jayharris.minimax.search.cutoff.CutoffTest;
+import info.jayharris.minimax.search.cutoff.FalseCutoffTest;
 
 import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
