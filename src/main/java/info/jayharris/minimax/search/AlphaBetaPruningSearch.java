@@ -15,9 +15,11 @@ import java.util.function.ToDoubleFunction;
  */
 public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Action<S, A>> implements Search<S, A> {
 
-    CutoffTest<S, A> cutoffTest;
-    ToDoubleFunction<S> heuristic;
-    TranspositionTable<S, A> transpositionTable;
+    private final CutoffTest<S, A> cutoffTest;
+    private final ToDoubleFunction<S> heuristic;
+    private final TranspositionTable<S, A> transpositionTable;
+
+    private int nodesExamined = 0;
 
     public AlphaBetaPruningSearch(ToDoubleFunction<S> heuristic) {
         this(FalseCutoffTest.getInstance(), heuristic);
@@ -36,6 +38,7 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
 
     @Override
     public A perform(S initialState) {
+        nodesExamined = 0;
         return perform(Node.createRootNode(initialState, new MaxValueFunction()));
     }
 
@@ -65,6 +68,8 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
         @Override
         public double applyAsDouble(Node<S, A> node) {
             S state = node.getState();
+
+            ++nodesExamined;
 
             OptionalDouble t;
             if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
@@ -106,6 +111,8 @@ public abstract class AlphaBetaPruningSearch<S extends State<S, A>, A extends Ac
 
         public double applyAsDouble(Node<S, A> node) {
             S state = node.getState();
+
+            ++nodesExamined;
 
             OptionalDouble t;
             if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {

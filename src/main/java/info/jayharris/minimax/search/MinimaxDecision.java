@@ -20,6 +20,8 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
     private final CutoffTest<S, A> cutoffTest;
     private final TranspositionTable<S, A> transpositionTable;
 
+    private int nodesExamined = 0;
+
     public MinimaxDecision(ToDoubleFunction<S> heuristicFn) {
         this(heuristicFn, FalseCutoffTest.getInstance());
     }
@@ -37,6 +39,7 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
 
     @Override
     public A perform(S initialState) {
+        nodesExamined = 0;
         return perform(Node.createRootNode(initialState, this::maxValue));
     }
 
@@ -52,6 +55,8 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
 
     private double maxValue(Node<S, A> node) {
         S state = node.getState();
+
+        ++nodesExamined;
 
         OptionalDouble t;
         if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
@@ -79,6 +84,8 @@ public abstract class MinimaxDecision<S extends State<S, A>, A extends Action<S,
 
     private double minValue(Node<S, A> node) {
         S state = node.getState();
+
+        ++nodesExamined;
 
         OptionalDouble t;
         if ((t = transpositionTable.getUtilityValue(state)).isPresent()) {
